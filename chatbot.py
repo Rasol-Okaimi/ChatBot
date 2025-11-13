@@ -16,7 +16,7 @@ chat_questions = {
     "what can you do": "I can answer basic questions and chat with you!",
     "what is 2 plus 2": "2 plus 2 equals 4.",
     "what is the largest planet": "Jupiter is the largest planet in our solar system.",
-    "who is the president of the usa": "As of 2025, the President of the USA is Joe Biden.",
+    "who is the president of the usa": "As of 2025, the President of the USA is Donald Trump.",
     "what is the tallest mountain": "Mount Everest is the tallest mountain in the world.",
 }
 
