@@ -25,20 +25,20 @@ def chatbot_response(question):
     q = question.strip().lower()
     if q in chat_questions:
         answer = chat_questions[q]
-        return f"{answer} What else would you like to know?"
+        return f"Chatbot: {answer} What else would you like to know?"
     else:
-        return "Sorry, I don't recognize that question. Please ask another question."
+        return "Chatbot: Sorry, I don't recognize that question. Please ask another question."
 
 
 def interactive_chat():
     # Handles #7 and #8
-    print(f"{get_time()} Hello!")
-    print(f"{get_time()} How can I help you?")
+    print(f"{get_time()} Chatbot: Hello!")
+    print(f"{get_time()} Chatbot: How can I help you?")
 
     while True:
-        user_input = input("You: ").strip()
+        user_input = input(f"{get_time()} You: ").strip()
         if user_input.lower() in ["bye", "exit", "quit"]:
-            print(f"{get_time()} Goodbye! Have a great day!")
+            print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
             break
         else:
             response = chatbot_response(user_input)
