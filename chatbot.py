@@ -1,14 +1,25 @@
 import sys
 import random
+import re  # Added for regex splitting to handle compound questions
 from datetime import datetime
 
 
 def get_time():
-
     return datetime.now().strftime("%H:%M:%S")
 
- # Handles (#10)
+
+# Handles (#10)
 chat_questions = {
+    # Added greetings to handle "Hi, what is python?" scenarios
+    "hi": [
+        "Hello!",
+        "Hi there!",
+        "Greetings!",
+    ],
+    "hello": [
+        "Hello!",
+        "Hi there!",
+    ],
     "what is your name": [
         "I am Chatbot Group 7.",
         "You can call me Chatbot Group 7.",
@@ -23,7 +34,7 @@ chat_questions = {
 
     "what is python": [
         "Python is a powerful and easy-to-learn programming language.",
-         "Python is learn programming language.",
+        "Python is a great programming language to learn.",
         "Python is a popular programming language used for many types of software development.",
     ],
 
@@ -35,7 +46,7 @@ chat_questions = {
 
     "who created you": [
         "I was created by a developer using Python.",
-        "I was developer by Python!",
+        "I was developed using Python!",
         "A Python developer brought me to life!",
     ],
 
@@ -47,37 +58,42 @@ chat_questions = {
 
     "what is 2 plus 2": [
         "2 plus 2 equals 4.",
-         " 4 is the answer.",
+        "4 is the answer.",
         "The answer is 4.",
     ],
 
     "what is the largest planet": [
         "Jupiter is the largest planet in our solar system.",
-         "The largest planet is Jupiter.",
+        "The largest planet is Jupiter.",
         "The biggest planet in our solar system is Jupiter.",
     ],
 
     "who is the president of the usa": [
         "As of 2025, the President of the USA is Donald Trump.",
-         "The President of the USA is Donald Trump.",
+        "The President of the USA is Donald Trump.",
         "Donald Trump is the current President of the United States (2025).",
+    ],
+
+    "who is the president of america": [
+        "As of 2025, the President of the USA is Donald Trump.",
+        "The President of the USA is Donald Trump.",
     ],
 
     "what is the tallest mountain": [
         "Mount Everest is the tallest mountain in the world.",
-        "Everest the tallest mountain in the world.",
+        "Everest is the tallest mountain in the world.",
         "Everest is the highest mountain above sea level.",
     ],
 }
 
-keyword_suggestions = { ## keyword_suggestions Handles (#12)
+keyword_suggestions = {  ## keyword_suggestions Handles (#12)
     "python": [
         "what is python",
         "what can you do with python",
     ],
     "president": [
         "who is the president of the usa",
-         "who is the president of America",
+        "who is the president of America",
     ],
     "planet": [
         "what is the largest planet",
@@ -86,18 +102,67 @@ keyword_suggestions = { ## keyword_suggestions Handles (#12)
         "what is the tallest mountain",
     ],
 }
+# Handles (#14) Handle multiple variations of the same question
+question_variants = {
+    "what is python programing": "what is python",
+    "can you describe python programming": "what is python",
+    "what do you mean by python programming": "what is python",
+    "what is the meaning of python programming": "what is python",
+    "what is python language": "what is python",
+}
 
 last_suggestions = []
 
-def chatbot_response(question):
-    q = question.strip().lower()
-    if q in chat_questions:
-        answer = random.choice(chat_questions[q])  # Handles (#11)
-        return f"Chatbot: {answer} What else would you like to know?"
-    else:
-        return "Chatbot: Sorry, I don't recognize that question. Please ask another question."
 
-def suggest_questions(keyword): ## Handles (#12)
+def chatbot_response(user_input):
+
+    user_input = user_input.lower().strip()
+
+    # Handles (#13) Compound questions
+    # 1. Define delimiters for compound questions.
+    # We split by: ' and ', ' or ', ' & ', or punctuation like ',' '?' or ';'
+    # The regex logic:
+    # \s+ matches whitespace
+    # (?: ... ) groups words like 'and', 'or' without capturing them as separate tokens in the result
+    # [?,;] matches punctuation
+    split_pattern = r'\s*(?:and|or|also|as well as|and also|or also)\s*|[?,;]+\s*'
+    # Handles (#13) Compound questions
+    # Split the input string into parts based on the pattern
+    parts = re.split(split_pattern, user_input)
+
+    found_answers = []
+
+    for part in parts:
+        # Clean up the specific part (remove trailing whitespace or ?)
+        clean_part = part.strip().replace('?', '')
+
+        if not clean_part:
+            continue  # Skip empty strings caused by trailing punctuation
+
+        # Handles (#14) Handle multiple variations of the same question
+        if clean_part in question_variants:
+            clean_part = question_variants[clean_part]
+
+        # Check if this part exists in our knowledge base
+        if clean_part in chat_questions:
+            answer = random.choice(chat_questions[clean_part])
+            found_answers.append(answer)
+
+    # 2. Construct the final response
+    if len(found_answers) > 0:
+        # If we found multiple answers, join them nicely.
+        if len(found_answers) == 1:
+            return f"Chatbot: {found_answers[0]} What else would you like to know?"
+        else:
+            # Join multiple answers with a separator
+            combined_response = " Also, ".join(found_answers)
+            return f"Chatbot: {combined_response} What else would you like to know?"
+    else:
+        # If no parts matched, return the error message
+        return "Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question."
+
+
+def suggest_questions(keyword):  ## Handles (#12)
     keyword = keyword.lower()
     if keyword in keyword_suggestions:
         return keyword_suggestions[keyword]
@@ -112,37 +177,47 @@ def interactive_chat():
     global last_suggestions
 
     while True:
-        user_input = input(f"{get_time()} You: ").strip()
+        try:
+            user_input = input(f"{get_time()} You: ").strip()
+        except EOFError:
+            break
+
+        if not user_input:
+            continue
+
         if user_input.lower() in ["bye", "exit", "quit"]:
             print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
             break
-        ## Handles (#12) # If the user enters a number, we check if it is a number selected from previous suggestions.
+
+        ## Handles (#12) - Selection by Number
         if user_input.isdigit() and last_suggestions:
             choice = int(user_input)
             if 1 <= choice <= len(last_suggestions):
                 selected_question = last_suggestions[choice - 1]
                 response = chatbot_response(selected_question)
                 print(f"{get_time()} {response}")
-
-                ## Handles (#12) # After selection, we re-examine the suggestions to avoid errors later.
                 last_suggestions = []
                 continue
             else:
                 print(f"{get_time()} Chatbot: Invalid question number. Please try again.")
                 continue
 
-
-        ## Handles (#12) #If it's not a number, we look for a keyword to suggest questions.
+        ## Handles (#12) - Keyword Suggestions
+        # Note: If the user types a compound question like "python and java",
+        # suggest_questions might fail to find a direct match, which is fine.
+        # It will pass through to chatbot_response to be handled as a compound question.
         suggestions = suggest_questions(user_input)
         if suggestions:
             last_suggestions = suggestions
-            print(f"{get_time()} Chatbot: You might want to ask:-")
+            print(f"{get_time()} Chatbot: You might want to ask:")
             for i, q in enumerate(suggestions, 1):
                 print(f"  {i}. {q}")
             print(f"{get_time()} Chatbot: Please type the number of your question choice.")
             continue
 
-        ## Handles (#12) # If it's neither a number nor a keyword, we'll reply directly.
+        last_suggestions = []  # Clear suggestions if user types something new
+
+        ## Handles (#12) and Compound Questions
         response = chatbot_response(user_input)
         print(f"{get_time()} {response}")
 
@@ -155,7 +230,7 @@ def cli_mode(question):
 
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[1] == "--question":
-        question_arg = sys.argv[2]
+        question_arg = " ".join(sys.argv[2:])
         cli_mode(question_arg)
     else:
         interactive_chat()
