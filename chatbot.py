@@ -1,6 +1,7 @@
 import sys
 import random
 import re  # Added for regex splitting to handle compound questions
+import csv
 from datetime import datetime
 
 
@@ -112,7 +113,6 @@ question_variants = {
 }
 
 last_suggestions = []
-
 
 def chatbot_response(user_input):
 
@@ -227,10 +227,61 @@ def cli_mode(question):
     response = chatbot_response(question)
     print(f"{get_time()} {response}")
 
+# Handles (#15) Import CSV file
+def import_csv(filepath):
+    global chat_questions
+
+    new_data = {}
+
+    with open(filepath, newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            question = row["question"].strip().lower()
+
+            answers = [
+                row["answer1"],
+                row["answer2"],
+                row["answer3"],
+                row["answer4"]
+            ]
+
+            # remove empty answers
+            answers = [a for a in answers if a and a.strip()]
+
+            new_data[question] = answers
+
+    chat_questions = new_data
+    print(f"{get_time()} Chatbot: CSV imported successfully! {len(chat_questions)} questions loaded.")
+
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2 and sys.argv[1] == "--question":
-        question_arg = " ".join(sys.argv[2:])
+    # if len(sys.argv) > 2 and sys.argv[1] == "--question":
+    #     question_arg = " ".join(sys.argv[2:])
+    #     cli_mode(question_arg)
+    # else:
+    #     interactive_chat()
+    
+      # Import mode
+    if "--import" in sys.argv:
+        try:
+            filetype = sys.argv[sys.argv.index("--filetype") + 1]
+            filepath = sys.argv[sys.argv.index("--filepath") + 1]
+
+            if filetype.upper() == "CSV":
+                import_csv(filepath)
+            else:
+                print("Unsupported file type. Only CSV is allowed.")
+                sys.exit(1)
+
+        except Exception as e:
+            print("Error during import:", e)
+            sys.exit(1)
+
+    # CLI question mode
+    if len(sys.argv) > 2 and "--question" in sys.argv:
+        question_arg = " ".join(sys.argv[sys.argv.index("--question") + 1:])
         cli_mode(question_arg)
+
     else:
         interactive_chat()
