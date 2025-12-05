@@ -1,0 +1,11 @@
+question,answer1,answer2,answer3,answer4
+what is python,"Python is a programming language.","Python is easy to learn.","Python is a programming language used to write software.", 
+who created python,"Guido van Rossum created Python.",,, 
+what is AI,"AI means Artificial Intelligence.","AI lets computers learn.","AI is technology that makes machines act smart.","AI is a system that can solve problems on its own.",
+what is a variable,"A variable stores data.","It holds a value.",, 
+what is a loop,"A loop repeats code.","A loop runs the same code again and again until a condition is met.",, 
+what is HTML,"HTML builds webpages.","It is a markup language.",, 
+what is an API,"An API lets programs talk to each other.","An API is a set of ruwhat is AIles for how software can share data.","An API lets apps connect and work together.","An API is like a menu that tells you what a software service can do." 
+what is a function,"A function is reusable code.","A function takes input, does work, and can return a result.","A function helps organize code into smaller tasks.", "A function lets you avoid repeating the same code."
+what is the capital of france,"It is Paris.","Paris is the capital.",, 
+what is the largest planet,"Jupiter is the largest planet.","Its diameter is about 11 times that of Earth.",, 
