@@ -1,6 +1,7 @@
 import sys
 import random
 import re  # Added for regex splitting to handle compound questions
+import csv
 from datetime import datetime
 
 
@@ -86,7 +87,8 @@ chat_questions = {
     ],
 }
 
-keyword_suggestions = {  ## keyword_suggestions Handles (#12)
+## keyword_suggestions Handles (#12)
+keyword_suggestions = {
     "python": [
         "what is python",
         "what can you do with python",
@@ -102,6 +104,7 @@ keyword_suggestions = {  ## keyword_suggestions Handles (#12)
         "what is the tallest mountain",
     ],
 }
+
 # Handles (#14) Handle multiple variations of the same question
 question_variants = {
     "what is python programing": "what is python",
@@ -115,50 +118,34 @@ last_suggestions = []
 
 
 def chatbot_response(user_input):
-
     user_input = user_input.lower().strip()
 
     # Handles (#13) Compound questions
-    # 1. Define delimiters for compound questions.
-    # We split by: ' and ', ' or ', ' & ', or punctuation like ',' '?' or ';'
-    # The regex logic:
-    # \s+ matches whitespace
-    # (?: ... ) groups words like 'and', 'or' without capturing them as separate tokens in the result
-    # [?,;] matches punctuation
     split_pattern = r'\s*(?:and|or|also|as well as|and also|or also)\s*|[?,;]+\s*'
-    # Handles (#13) Compound questions
-    # Split the input string into parts based on the pattern
     parts = re.split(split_pattern, user_input)
 
     found_answers = []
 
     for part in parts:
-        # Clean up the specific part (remove trailing whitespace or ?)
         clean_part = part.strip().replace('?', '')
 
         if not clean_part:
-            continue  # Skip empty strings caused by trailing punctuation
+            continue
 
-        # Handles (#14) Handle multiple variations of the same question
         if clean_part in question_variants:
             clean_part = question_variants[clean_part]
 
-        # Check if this part exists in our knowledge base
         if clean_part in chat_questions:
             answer = random.choice(chat_questions[clean_part])
             found_answers.append(answer)
 
-    # 2. Construct the final response
     if len(found_answers) > 0:
-        # If we found multiple answers, join them nicely.
         if len(found_answers) == 1:
             return f"Chatbot: {found_answers[0]} What else would you like to know?"
         else:
-            # Join multiple answers with a separator
             combined_response = " Also, ".join(found_answers)
             return f"Chatbot: {combined_response} What else would you like to know?"
     else:
-        # If no parts matched, return the error message
         return "Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question."
 
 
@@ -189,7 +176,6 @@ def interactive_chat():
             print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
             break
 
-        ## Handles (#12) - Selection by Number
         if user_input.isdigit() and last_suggestions:
             choice = int(user_input)
             if 1 <= choice <= len(last_suggestions):
@@ -202,10 +188,6 @@ def interactive_chat():
                 print(f"{get_time()} Chatbot: Invalid question number. Please try again.")
                 continue
 
-        ## Handles (#12) - Keyword Suggestions
-        # Note: If the user types a compound question like "python and java",
-        # suggest_questions might fail to find a direct match, which is fine.
-        # It will pass through to chatbot_response to be handled as a compound question.
         suggestions = suggest_questions(user_input)
         if suggestions:
             last_suggestions = suggestions
@@ -215,9 +197,8 @@ def interactive_chat():
             print(f"{get_time()} Chatbot: Please type the number of your question choice.")
             continue
 
-        last_suggestions = []  # Clear suggestions if user types something new
+        last_suggestions = []
 
-        ## Handles (#12) and Compound Questions
         response = chatbot_response(user_input)
         print(f"{get_time()} {response}")
 
@@ -228,9 +209,135 @@ def cli_mode(question):
     print(f"{get_time()} {response}")
 
 
+# Handles (#15) Import CSV file
+def import_csv(filepath):
+    global chat_questions
+
+    new_data = {}
+
+    with open(filepath, newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            question = row["question"].strip().lower()
+
+            answers = [
+                row["answer1"],
+                row["answer2"],
+                row["answer3"],
+                row["answer4"]
+            ]
+
+            answers = [a for a in answers if a and a.strip()]
+
+            new_data[question] = answers
+
+    chat_questions = new_data
+    print(f"{get_time()} Chatbot: CSV imported successfully! {len(chat_questions)} questions loaded.")
+
+# Handles (#17 + 18) Add and Remove questions
+
+def add_question(question, answer):
+    question = question.lower().strip()
+    if question in chat_questions:
+        chat_questions[question].append(answer)
+        print(f"{get_time()} Chatbot: Added new answer to existing question: {question}")
+    else:
+        chat_questions[question] = [answer]
+        print(f"{get_time()} Chatbot: Added new question with answer.")
+
+    print(f"{get_time()} Chatbot: Updated list:", chat_questions[question])
+
+
+def remove_question(question):
+    question = question.lower().strip()
+    if question in chat_questions:
+        del chat_questions[question]
+        print(f"{get_time()} Chatbot: Removed question: {question}")
+    else:
+        print(f"{get_time()} Chatbot: Question not found.")
+
+
+def remove_answer(question, answer):
+    question = question.lower().strip()
+    if question not in chat_questions:
+        print(f"{get_time()} Chatbot: Question not found.")
+        return
+
+    if answer not in chat_questions[question]:
+        print(f"{get_time()} Chatbot: Answer not found for this question.")
+        return
+
+    chat_questions[question].remove(answer)
+    print(f"{get_time()} Chatbot: Removed answer from question: {question}")
+    print(f"{get_time()} Chatbot: Updated answers:", chat_questions[question])
+
+# Handles (#16) List all internal questions
+def list_all_questions():
+    print(f"{get_time()} Chatbot: Listing all stored questions:")
+    for i, q in enumerate(chat_questions.keys(), 1):
+        print(f"  {i}. {q}")
+    print(f"{get_time()} Chatbot: Total questions: {len(chat_questions)}")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) > 2 and sys.argv[1] == "--question":
-        question_arg = " ".join(sys.argv[2:])
+
+    # Import mode (15)
+    if "--import" in sys.argv:
+        try:
+            filetype = sys.argv[sys.argv.index("--filetype") + 1]
+            filepath = sys.argv[sys.argv.index("--filepath") + 1]
+
+            if filetype.upper() == "CSV":
+                import_csv(filepath)
+            else:
+                print(f"{get_time()} Chatbot: Unsupported file type. Only CSV is allowed.")
+                sys.exit(1)
+
+        except Exception as e:
+            print(f"{get_time()} Chatbot: Error during import:", e)
+            sys.exit(1)
+
+    # Handles (#17 + 18) Add and Remove questions
+    if "--add" in sys.argv:
+        if "--question" in sys.argv and "--answer" in sys.argv:
+            question = sys.argv[sys.argv.index("--question") + 1]
+            answer = sys.argv[sys.argv.index("--answer") + 1]
+            add_question(question, answer)
+            sys.exit(0)
+        else:
+            print(f"{get_time()} Chatbot: Usage: --add --question \"Q\" --answer \"A\"")
+            sys.exit(1)
+
+   # Remove Question or Answer
+    if "--remove" in sys.argv:
+        if "--question" in sys.argv and "--answer" in sys.argv:
+            # Remove specific answer
+            question = sys.argv[sys.argv.index("--question") + 1]
+            answer = sys.argv[sys.argv.index("--answer") + 1]
+            remove_answer(question, answer)
+            sys.exit(0)
+
+        elif "--question" in sys.argv:
+            # Remove whole question
+            question = sys.argv[sys.argv.index("--question") + 1]
+            remove_question(question)
+            sys.exit(0)
+
+        else:
+            print(f"{get_time()} Chatbot: Usage: --remove --question \"Q\" [--answer \"A\"]")
+            sys.exit(1)
+
+
+    # Handles (#16) List mode
+    if "--list" in sys.argv:
+        list_all_questions()
+        sys.exit(0)
+
+    # CLI question mode
+    if len(sys.argv) > 2 and "--question" in sys.argv:
+        question_arg = " ".join(sys.argv[sys.argv.index("--question") + 1:])
         cli_mode(question_arg)
+
     else:
         interactive_chat()
