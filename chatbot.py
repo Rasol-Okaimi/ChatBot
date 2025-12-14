@@ -5,7 +5,107 @@ import sys
 import json
 import random
 import subprocess
+import logging
 from datetime import datetime
+from trivia_game import play_trivia
+
+# Handle task number 22
+HELP_TEXT = """
+CHATBOT APPLICATION - HELP
+
+Syntax:
+  python chatbot.py [OPTIONS]
+
+Options:
+  --help
+      Show this help message and exit
+
+  --log
+      Enable file-based logging (disabled by default)
+
+  --log-level LEVEL
+      Set logging level: INFO or WARNING
+      Default: WARNING
+
+  --debug
+      Enable debug mode
+
+  --question "TEXT"
+      Ask a single question via CLI and exit
+
+  --import
+      Import questions from a file (use with --filetype and --filepath)
+
+  --filetype CSV
+      Specify import file type
+
+  --filepath PATH
+      Path to the import file
+
+  --add --question "Q" --answer "A"
+      Add a new question and answer
+
+  --remove --question "Q" [--answer "A"]
+      Remove a question or a specific answer
+
+  --list
+      List all stored questions
+
+  --test
+      Run unit tests and exit
+
+Examples:
+  python chatbot.py --help
+  python chatbot.py --log --log-level INFO
+  python chatbot.py --question "what is python"
+  python chatbot.py --import --filetype CSV --filepath questions.csv
+"""
+
+
+def print_help_and_exit():
+    print(HELP_TEXT)
+    sys.exit(0)
+
+
+def error_and_help(message):
+    print(f"ERROR: {message}\n")
+    print(HELP_TEXT)
+    sys.exit(1)
+
+
+if "--help" in sys.argv:
+    print_help_and_exit()
+
+KNOWN_ARGS = {
+    "--help", "--log", "--log-level", "--debug",
+    "--question", "--import", "--filetype", "--filepath",
+    "--add", "--answer", "--remove", "--list", "--test"
+}
+
+for arg in sys.argv[1:]:
+    if arg.startswith("--") and arg not in KNOWN_ARGS:
+        error_and_help(f"Unknown command line argument: {arg}")
+
+##Handle task number 21
+LOG_ENABLED = "--log" in sys.argv
+LOG_LEVEL = "WARNING"
+
+if "--log-level" in sys.argv:
+    try:
+        LOG_LEVEL = sys.argv[sys.argv.index("--log-level") + 1].upper()
+    except IndexError:
+        LOG_LEVEL = "WARNING"
+
+if LOG_ENABLED:
+    logging.basicConfig(
+        filename="chatbot.log",
+        filemode="a",
+        level=logging.INFO if LOG_LEVEL == "INFO" else logging.WARNING,
+        format="%(asctime)s [%(levelname)s] %(message)s"
+    )
+    logging.info("Logging enabled")
+else:
+    logging.disable(logging.CRITICAL)
 
 DEBUG_MODE = "--debug" in sys.argv
 
@@ -122,6 +222,7 @@ last_suggestions = []
 
 
 def chatbot_response(user_input):
+    logging.info(f"User asked: {user_input}")
 
     user_input = user_input.lower().strip()
 
@@ -144,6 +245,9 @@ def chatbot_response(user_input):
         if clean_part in chat_questions:
             answer = random.choice(chat_questions[clean_part])
             found_answers.append(answer)
+            logging.info(f"Answer found for: {part}")
+        else:
+            logging.warning(f"Unknown question: {part}")
 
     if len(found_answers) > 0:
         if len(found_answers) == 1:
@@ -178,8 +282,13 @@ def interactive_chat():
             continue
 
         if user_input.lower() in ["bye", "exit", "quit"]:
+            logging.info("User exited application")
             print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
             break
+
+        if user_input.lower() == "trivia":
+            play_trivia()
+            continue
 
         if user_input.isdigit() and last_suggestions:
             choice = int(user_input)
@@ -215,10 +324,12 @@ def cli_mode(question):
 
 # Handles (#15) Import CSV file
 def import_csv(filepath):
+    logging.info(f"Attempting CSV import: {filepath}")
     global chat_questions
     print(f"{get_time()} Chatbot: Starting CSV import...")
 
     if not os.path.exists(filepath):
+        logging.warning("CSV file path invalid")
         print(f"{get_time()} WARNING: Invalid file path: {filepath}")
         sys.exit(1)
 
@@ -248,6 +359,7 @@ def import_csv(filepath):
                 new_data[question] = answers
 
         chat_questions = new_data
+        logging.info("CSV import successful")
         print(f"{get_time()} Chatbot: CSV imported successfully! {len(chat_questions)} questions loaded.")
 
     except PermissionError:
@@ -257,6 +369,7 @@ def import_csv(filepath):
         print(f"{get_time()} WARNING: CSV file is corrupted.")
         sys.exit(1)
     except Exception as e:
+        logging.warning(f"CSV import failed: {e}")
         print(f"{get_time()} WARNING: Unexpected CSV import error: {e}")
         sys.exit(1)
 
@@ -270,6 +383,7 @@ def print_full_list():
         for j, ans in enumerate(answers, 1):
             print(f"     Answer {j}: {ans}")
 
+
 def save_questions_to_file(filepath="chat_questions.json"):
     try:
         with open(filepath, "w", encoding="utf-8") as f:
@@ -277,6 +391,7 @@ def save_questions_to_file(filepath="chat_questions.json"):
         print(f"{get_time()} Chatbot: Saved questions to {filepath}")
     except Exception as e:
         print(f"{get_time()} Chatbot: Error saving questions: {e}")
+
 
 def add_question(question, answer):
     question = question.lower().strip()
@@ -323,6 +438,7 @@ def remove_answer(question, answer):
     print_full_list()
     save_questions_to_file()
 
+
 # Handles (#16) List all internal questions
 def list_all_questions():
     print(f"{get_time()} Chatbot: Listing all stored questions:")
@@ -333,7 +449,7 @@ def list_all_questions():
 
 if __name__ == "__main__":
 
-    #(20)Run built-in self-tests using --test
+    # (20)Run built-in self-tests using --test
     if "--test" in sys.argv:
         if DEBUG_MODE:
             print(f"{get_time()} DEBUG: Running tests with debug mode enabled...")
