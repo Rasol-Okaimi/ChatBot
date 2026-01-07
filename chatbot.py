@@ -8,7 +8,7 @@ import subprocess
 import logging
 from datetime import datetime
 from trivia_game import play_trivia
-from weather_forecast import get_current_weather, get_forecast_weather
+from weather_app import get_current_weather, get_forecast_weather
 
 
 # Handle task number 22
