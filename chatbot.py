@@ -8,6 +8,8 @@ import subprocess
 import logging
 from datetime import datetime
 from trivia_game import play_trivia
+from weather_forecast import get_current_weather, get_forecast_weather
+
 
 # Handle task number 22
 HELP_TEXT = """
@@ -225,6 +227,21 @@ def chatbot_response(user_input):
     logging.info(f"User asked: {user_input}")
 
     user_input = user_input.lower().strip()
+    
+    # Handles(25) 🌦 Weather handling
+    location, event_date = extract_location_and_date(user_input)
+
+    if location:
+        try:
+            if event_date:
+                weather = get_forecast_weather(location, event_date)
+            else:
+                weather = get_current_weather(location)
+
+            return f"Chatbot: {weather} What else would you like to know?"
+        except Exception:
+            return "Chatbot: I found the location, but could not get the weather right now."
+
 
     # Handles (#13) Compound questions
     split_pattern = r'\s*(?:and|or|also|as well as|and also|or also)\s*|[?,;]+\s*'
@@ -265,259 +282,38 @@ def suggest_questions(keyword):  ## Handles (#12)
         return keyword_suggestions[keyword]
     return None
 
+# Hanldle (#25) Weather forecast integration
+def extract_location_and_date(user_input):
+    """
+    Extract location and date from user input.
+    Returns (location, date)
+    """
+    # Simple date pattern: YYYY-MM-DD
+    date_match = re.search(r"\d{4}-\d{2}-\d{2}", user_input)
+    event_date = date_match.group() if date_match else None
 
-def interactive_chat():
-    print(f"{get_time()} Chatbot: Hello!")
-    print(f"{get_time()} Chatbot: How can I help you?")
+    # Very simple location list (can be extended)
+    known_locations = ["goslar", "wolfenbüttel", "braunschweig", "berlin"]
 
-    global last_suggestions
-
-    while True:
-        try:
-            user_input = input(f"{get_time()} You: ").strip()
-        except EOFError:
+    location = None
+    for city in known_locations:
+        if city in user_input.lower():
+            location = city.title()
             break
 
-        if not user_input:
-            continue
+    return location, event_date
 
-        if user_input.lower() in ["bye", "exit", "quit"]:
-            logging.info("User exited application")
-            print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
-            break
+# ===============================
+# CLI QUESTION HANDLER (REQUIRED)
+# ===============================
 
-        if user_input.lower() == "trivia":
-            play_trivia()
-            continue
-
-        if user_input.isdigit() and last_suggestions:
-            choice = int(user_input)
-            if 1 <= choice <= len(last_suggestions):
-                selected_question = last_suggestions[choice - 1]
-                response = chatbot_response(selected_question)
-                print(f"{get_time()} {response}")
-                last_suggestions = []
-                continue
-            else:
-                print(f"{get_time()} Chatbot: Invalid question number. Please try again.")
-                continue
-
-        suggestions = suggest_questions(user_input)
-        if suggestions:
-            last_suggestions = suggestions
-            print(f"{get_time()} Chatbot: You might want to ask:")
-            for i, q in enumerate(suggestions, 1):
-                print(f"  {i}. {q}")
-            print(f"{get_time()} Chatbot: Please type the number of your question choice.")
-            continue
-
-        last_suggestions = []
-
-        response = chatbot_response(user_input)
-        print(f"{get_time()} {response}")
-
-
-def cli_mode(question):
-    response = chatbot_response(question)
-    print(f"{get_time()} {response}")
-
-
-# Handles (#15) Import CSV file
-def import_csv(filepath):
-    logging.info(f"Attempting CSV import: {filepath}")
-    global chat_questions
-    print(f"{get_time()} Chatbot: Starting CSV import...")
-
-    if not os.path.exists(filepath):
-        logging.warning("CSV file path invalid")
-        print(f"{get_time()} WARNING: Invalid file path: {filepath}")
-        sys.exit(1)
-
-    if not filepath.lower().endswith(".csv"):
-        print(f"{get_time()} WARNING: Unsupported file type. Only CSV allowed.")
-        sys.exit(1)
-
+if "--question" in sys.argv:
     try:
-        with open(filepath, newline="", encoding="utf-8") as file:
-            reader = csv.DictReader(file)
-            # REQUIRED CSV COLUMNS
-            required = ["question", "answer1", "answer2", "answer3", "answer4"]
-            for field in required:
-                if field not in reader.fieldnames:
-                    print(f"{get_time()} WARNING: Missing required CSV column: {field}")
-                    sys.exit(1)
+        question_index = sys.argv.index("--question") + 1
+        user_question = sys.argv[question_index]
+    except IndexError:
+        error_and_help("Missing text after --question")
 
-            new_data = {}
-
-            for row in reader:
-                question = row["question"].strip().lower()
-                answers = [row.get(f"answer{i}", "").strip() for i in range(1, 5)]
-                answers = [a for a in answers if a]
-                if not answers:
-                    print(f"{get_time()} WARNING: No answers for question: {question}")
-                    continue
-                new_data[question] = answers
-
-        chat_questions = new_data
-        logging.info("CSV import successful")
-        print(f"{get_time()} Chatbot: CSV imported successfully! {len(chat_questions)} questions loaded.")
-
-    except PermissionError:
-        print(f"{get_time()} WARNING: Permission denied for file: {filepath}")
-        sys.exit(1)
-    except csv.Error:
-        print(f"{get_time()} WARNING: CSV file is corrupted.")
-        sys.exit(1)
-    except Exception as e:
-        logging.warning(f"CSV import failed: {e}")
-        print(f"{get_time()} WARNING: Unexpected CSV import error: {e}")
-        sys.exit(1)
-
-
-# Handles (#17 + 18) Add and Remove questions
-
-def print_full_list():
-    print(f"{get_time()} Chatbot: Updated full questions and answers list:")
-    for i, (q, answers) in enumerate(chat_questions.items(), 1):
-        print(f"  {i}. Question: {q}")
-        for j, ans in enumerate(answers, 1):
-            print(f"     Answer {j}: {ans}")
-
-
-def save_questions_to_file(filepath="chat_questions.json"):
-    try:
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(chat_questions, f, ensure_ascii=False, indent=4)
-        print(f"{get_time()} Chatbot: Saved questions to {filepath}")
-    except Exception as e:
-        print(f"{get_time()} Chatbot: Error saving questions: {e}")
-
-
-def add_question(question, answer):
-    question = question.lower().strip()
-    if question in chat_questions:
-        if answer in chat_questions[question]:
-            print(f"{get_time()} Chatbot: The answer already exists for the question: {question}")
-        else:
-            chat_questions[question].append(answer)
-            print(f"{get_time()} Chatbot: Added new answer to existing question: {question}")
-    else:
-        chat_questions[question] = [answer]
-        print(f"{get_time()} Chatbot: Added new question with answer.")
-
-    print_full_list()
-    save_questions_to_file()
-
-
-def remove_question(question):
-    question = question.lower().strip()
-    if question in chat_questions:
-        del chat_questions[question]
-        print(f"{get_time()} Chatbot: Removed question: {question}")
-
-        print_full_list()
-        save_questions_to_file()
-
-    else:
-        print(f"{get_time()} Chatbot: Question not found.")
-
-
-def remove_answer(question, answer):
-    question = question.lower().strip()
-    if question not in chat_questions:
-        print(f"{get_time()} Chatbot: Question not found.")
-        return
-
-    if answer not in chat_questions[question]:
-        print(f"{get_time()} Chatbot: Answer not found for this question.")
-        return
-
-    chat_questions[question].remove(answer)
-    print(f"{get_time()} Chatbot: Removed answer from question: {question}")
-
-    print_full_list()
-    save_questions_to_file()
-
-
-# Handles (#16) List all internal questions
-def list_all_questions():
-    print(f"{get_time()} Chatbot: Listing all stored questions:")
-    for i, q in enumerate(chat_questions.keys(), 1):
-        print(f"  {i}. {q}")
-    print(f"{get_time()} Chatbot: Total questions: {len(chat_questions)}")
-
-
-if __name__ == "__main__":
-
-    # (20)Run built-in self-tests using --test
-    if "--test" in sys.argv:
-        if DEBUG_MODE:
-            print(f"{get_time()} DEBUG: Running tests with debug mode enabled...")
-        else:
-            print("Running unit tests...")
-
-        subprocess.run([sys.executable, "test_chatbot.py"])
-        sys.exit(0)
-
-    # Import mode (15)
-    if "--import" in sys.argv:
-        try:
-            filetype = sys.argv[sys.argv.index("--filetype") + 1]
-            filepath = sys.argv[sys.argv.index("--filepath") + 1]
-
-            if filetype.upper() == "CSV":
-                import_csv(filepath)
-            else:
-                print(f"{get_time()} Chatbot: Unsupported file type. Only CSV is allowed.")
-                sys.exit(1)
-
-        except Exception as e:
-            print(f"{get_time()} Chatbot: Error during import:", e)
-            sys.exit(1)
-
-    # Handles (#17 + 18) Add and Remove questions
-    if "--add" in sys.argv:
-        if "--question" in sys.argv and "--answer" in sys.argv:
-            question = sys.argv[sys.argv.index("--question") + 1]
-            answer = sys.argv[sys.argv.index("--answer") + 1]
-            add_question(question, answer)
-            sys.exit(0)
-        else:
-            print(f"{get_time()} Chatbot: Usage: --add --question \"Q\" --answer \"A\"")
-            sys.exit(1)
-
-    # Remove Question or Answer
-    if "--remove" in sys.argv:
-        if "--question" in sys.argv and "--answer" in sys.argv:
-            question = sys.argv[sys.argv.index("--question") + 1]
-            answer = sys.argv[sys.argv.index("--answer") + 1]
-            remove_answer(question, answer)
-            sys.exit(0)
-
-        elif "--question" in sys.argv:
-            question = sys.argv[sys.argv.index("--question") + 1]
-            remove_question(question)
-            sys.exit(0)
-
-        else:
-            print(f"{get_time()} Chatbot: Usage: --remove --question \"Q\" [--answer \"A\"]")
-            sys.exit(1)
-
-    # Handles (#16) List mode
-    if "--list" in sys.argv:
-        list_all_questions()
-        sys.exit(0)
-
-    # CLI question mode
-    if len(sys.argv) > 2 and "--question" in sys.argv:
-        question_arg = " ".join(sys.argv[sys.argv.index("--question") + 1:])
-        cli_mode(question_arg)
-        sys.exit(0)
-
-    if len(sys.argv) > 2 and sys.argv[1] == "--question":
-        question_arg = " ".join(sys.argv[2:])
-        cli_mode(question_arg)
-        sys.exit(0)
-
-    else:
-        interactive_chat()
+    response = chatbot_response(user_question)
+    print(response)
+    sys.exit(0)
