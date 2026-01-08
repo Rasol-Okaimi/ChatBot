@@ -21,7 +21,7 @@ class TestChatbot(unittest.TestCase):
         print("test_compound_question is Successful")
 
     def test_unknown_question(self):
-        response = chatbot_response("who is the king of mars")
+        response = chatbot_response("who is the capital of USA")
         self.assertIn("don't recognize", response.lower())
         print("test_compound_question is Successful")
 

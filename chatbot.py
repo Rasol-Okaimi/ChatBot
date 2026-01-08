@@ -8,6 +8,7 @@ import subprocess
 import logging
 from datetime import datetime
 from trivia_game import play_trivia
+from weather_app import get_current_weather, get_forecast_weather
 
 # Handle task number 22
 HELP_TEXT = """
@@ -112,6 +113,38 @@ DEBUG_MODE = "--debug" in sys.argv
 def get_time():
     return datetime.now().strftime("%H:%M:%S")
 
+#lecture_halls_events
+locations_events = {
+    "lecture hall a": {
+        "location": "berlin",
+        "description": "central campus building and seating for 200 people."
+    },
+    "research conference": {
+        "location": "braunschweig",
+        "event_date": "2026-02-20",
+        "description": "Held at the Braunschweig Conference Center, Hall B."
+    },
+    "university seminar": {
+        "location": "goslar",
+         "event_date": "2026-01-12",
+        "description": "Seminar room in the historic Goslar campus ,Hall C."
+    },
+
+    "when is university seminar": {
+        "location": "goslar",
+         "event_date": "2026-01-22",
+        "description": "Seminar room in the historic Goslar campus ,Hall C."
+    },
+
+    "campus north": {
+        "location": "wolfenbüttel",
+        "description": "Main campus for engineering and sciences."
+    },
+    "library building": {
+        "location": "berlin",
+        "description": "Central library with extensive collections."
+    }
+}
 
 # Handles (#10)
 chat_questions = {
@@ -125,6 +158,7 @@ chat_questions = {
         "Hello!",
         "Hi there!",
     ],
+
     "what is your name": [
         "I am Chatbot Group 7.",
         "You can call me Chatbot Group 7.",
@@ -147,6 +181,12 @@ chat_questions = {
         "The capital of France is Paris.",
         "Paris is the capital city of France.",
         "France’s capital is Paris.",
+    ],
+
+    "what is the capital of germany": [
+    "The capital of Germany is Berlin.",
+    "Berlin is the capital city of Germany.",
+    "Germany’s capital is Berlin.",
     ],
 
     "who created you": [
@@ -220,13 +260,95 @@ question_variants = {
 
 last_suggestions = []
 
+# Hanldle (#25) Weather forecast integration
+def extract_location_and_date(user_input):
+    """
+    Extract location and date from user input.
+    Returns (location, date)
+    """
+    # Simple date pattern: YYYY-MM-DD
+    date_match = re.search(r"\d{4}-\d{2}-\d{2}", user_input)
+    event_date = date_match.group() if date_match else None
+
+    # Very simple location list (can be extended)
+    # Generate known locations dynamically from locations_events
+
+    known_locations = list(set(
+        event["location"].lower()
+        for event in locations_events.values()
+        if "location" in event
+    ))
+
+    location = None
+    for city in known_locations:
+        if city in user_input.lower():
+            location = city.title()
+            break
+
+    return location, event_date
 
 def chatbot_response(user_input):
     logging.info(f"User asked: {user_input}")
 
     user_input = user_input.lower().strip()
 
-    # Handles (#13) Compound questions
+    # First, check if the question is in the Events/Halls dictionary.
+    if user_input in locations_events:
+        location = locations_events[user_input]["location"]
+        description = locations_events[user_input].get("description", "")
+        event_date = locations_events[user_input].get("event_date", None)  # Added to get event date
+
+        # We are trying to get an answer from chat_questions (if one exists).
+        answers = chat_questions.get(user_input, [])
+        answer = random.choice(answers) if answers else ""
+
+        try:
+            # Provide forecast weather if event date exists, otherwise current weather
+            if event_date:
+                weather = get_forecast_weather(location, event_date)
+                if weather is None:
+                    weather = "I found the location, but could not get the weather right now."
+            else:
+                weather = get_current_weather(location)
+
+        except Exception:
+            weather = "I found the location, but could not get the weather right now."
+
+        # Combine answer with description and weather conditions into one reply
+        response_parts = []
+        if answer:
+            response_parts.append(answer)
+        if location:
+            response_parts.append(f"Location: {location.title()},")
+        if event_date:
+            response_parts.append(f"Event date: {event_date},")
+        if description:
+            response_parts.append(f"Description: {description}")
+
+        # Weather part, after date and description
+        if event_date:
+            response_parts.append(f"{weather}")
+        else:
+            response_parts.append(f"{weather}")
+
+        combined_response = " ".join(response_parts)
+        return f"Chatbot: {combined_response} . What else would you like to know?"
+
+    # Handles (#25) Weather handling for any location/date mentioned in user input
+    location, event_date = extract_location_and_date(user_input)
+
+    if location:
+        try:
+            if event_date:
+                weather = get_forecast_weather(location, event_date)
+                return f"Chatbot: {weather} , What else would you like to know?"
+            else:
+                weather = get_current_weather(location)
+                return f"Chatbot: {weather} , What else would you like to know?"
+        except Exception:
+            return "Chatbot: I found the location, but could not get the weather right now."
+
+    # Handles (#13) Compound questions split and processing
     split_pattern = r'\s*(?:and|or|also|as well as|and also|or also)\s*|[?,;]+\s*'
     parts = re.split(split_pattern, user_input)
 
@@ -236,9 +358,9 @@ def chatbot_response(user_input):
         clean_part = part.strip().replace('?', '')
 
         if not clean_part:
-            continue  # Skip empty
+            continue  # Skip empty parts
 
-        # Handles (#14)
+        # Handles (#14) question variants normalization
         if clean_part in question_variants:
             clean_part = question_variants[clean_part]
 
@@ -258,13 +380,11 @@ def chatbot_response(user_input):
     else:
         return "Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question."
 
-
 def suggest_questions(keyword):  ## Handles (#12)
     keyword = keyword.lower()
     if keyword in keyword_suggestions:
         return keyword_suggestions[keyword]
     return None
-
 
 def interactive_chat():
     print(f"{get_time()} Chatbot: Hello!")

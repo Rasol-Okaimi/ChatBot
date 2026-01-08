@@ -1,0 +1,45 @@
+#  Run without debug
+python chatbot.py --test
+#  Run debug
+python chatbot.py --test --debug
+
+#  weather
+lecture hall a
+research conference
+What is the weather in Goslar?
+university seminar
+What is the weather in Wolfenbüttel?
+Tell me about the event location at Goslar.
+Where is the lecture hall in Berlin on 2026-01-10?
+What will be the weather in Wolfenbüttel on 2026-01-12?
+"What is the weather in Hamburg?" xxxx
+
+# Import CSV
+python chatbot.py --import --filetype CSV --filepath question.csv
+
+# question-list
+python chatbot.py --list
+
+# import CSV (wrong path error CSV)
+python chatbot.py --import --filetype CSV --filepath "path\to\your\questions.csv"
+
+# new csv question
+python chatbot.py --add --question "what is AI" --answer "AI stands for Artificial Intelligence."
+
+#
+python chatbot.py --add --question "what is python" --answer "Python is also used for AI and data science."
+
+#delete question
+python chatbot.py --remove --question "what is AI"
+
+#delete answer from question
+python chatbot.py --remove --question "what is python" --answer "Python is a powerful and easy-to-learn programming language."
+
+# list of question
+python chatbot.py --list
+
+# direct question CLI mode
+python chatbot.py --question "what is python"
+
+
+

@@ -1,1 +1,10 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# PyCharm
 .idea/
+
+# OS files
+.DS_Store
+Thumbs.db
