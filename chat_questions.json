@@ -18,10 +18,20 @@
         "Feeling awesome today!",
         "I'm good! Thanks for asking."
     ],
+    "what is python": [
+        "Python is a powerful and easy-to-learn programming language.",
+        "Python is a great programming language to learn.",
+        "Python is a popular programming language used for many types of software development."
+    ],
     "what is the capital of france": [
         "The capital of France is Paris.",
         "Paris is the capital city of France.",
         "France’s capital is Paris."
+    ],
+    "what is the capital of germany": [
+        "The capital of Germany is Berlin.",
+        "Berlin is the capital city of Germany.",
+        "Germany’s capital is Berlin."
     ],
     "who created you": [
         "I was created by a developer using Python.",
@@ -56,5 +66,11 @@
         "Mount Everest is the tallest mountain in the world.",
         "Everest is the tallest mountain in the world.",
         "Everest is the highest mountain above sea level."
+    ],
+    "what is ai": [
+        "AI stands for Artificial Intelligence."
+    ],
+    "what is cpu": [
+        "CPU Computer Unit."
     ]
 }

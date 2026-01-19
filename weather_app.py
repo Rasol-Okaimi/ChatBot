@@ -7,6 +7,36 @@ API_KEY = "f46611925675b3de42dbbccab8d83212"
 BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather"
 BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
+#lecture_halls_events
+locations_events = {
+    "lecture hall a": {
+        "location": "berlin",
+        "description": "central campus building and seating for 200 people."
+    },
+    "research conference": {
+        "location": "braunschweig",
+        "event_date": "2026-02-20",
+        "description": "Held at the Braunschweig Conference Center, Hall B."
+    },
+    "university seminar": {
+        "location": "goslar",
+         "event_date": "2026-01-12",
+        "description": "Seminar room in the historic Goslar campus ,Hall C."
+    },
+    "when is university seminar": {
+        "location": "goslar",
+         "event_date": "2026-01-22",
+        "description": "Seminar room in the historic Goslar campus ,Hall C."
+    },
+    "campus north": {
+        "location": "wolfenbüttel",
+        "description": "Main campus for engineering and sciences."
+    },
+    "library building": {
+        "location": "berlin",
+        "description": "Central library with extensive collections."
+    }
+}
 
 def get_current_weather(location):
     """Fetch current weather for a location"""

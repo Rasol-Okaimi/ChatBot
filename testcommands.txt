@@ -36,7 +36,7 @@ python chatbot.py --import --filetype CSV --filepath "path\to\your\questions.csv
 
 # new csv question
 python chatbot.py --add --question "what is AI" --answer "AI stands for Artificial Intelligence."
-
+python chatbot.py --add --question "what is CPU" --answer "CPU Computer Unit."
 #
 python chatbot.py --add --question "what is python" --answer "Python is also used for AI and data science."
 
