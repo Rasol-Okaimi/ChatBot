@@ -3,6 +3,17 @@ python chatbot.py --test
 #  Run debug
 python chatbot.py --test --debug
 
+python chatbot.py --log
+python chatbot.py --log --log-level INFO
+python chatbot.py --log --log-level INFO --question "what is python"
+python chatbot.py --log --question "unknown question"
+
+python chatbot.py --help
+python chatbot.py --helo
+python chatbot.py --help --log
+
+Trivia
+
 #  weather
 lecture hall a
 research conference

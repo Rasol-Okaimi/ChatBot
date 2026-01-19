@@ -7,54 +7,54 @@ def get_time():
 
 TRIVIA_QUESTIONS = [
     {
-        "question": "What is the largest planet in our solar system?",
-        "options": ["Earth", "Jupiter", "Mars", "Saturn"],
-        "answer": "Jupiter"
+        "question": "Which programming language is mainly used for data science?",
+        "options": ["Python", "HTML", "CSS", "SQL"],
+        "answer": "Python"
     },
     {
-        "question": "What is the capital of France?",
-        "options": ["Paris", "Berlin", "Rome", "Madrid"],
-        "answer": "Paris"
+        "question": "What does CPU stand for?",
+        "options": ["Central Processing Unit", "Computer Power Unit", "Core Processing Utility", "Central Program Unit"],
+        "answer": "Central Processing Unit"
     },
     {
-        "question": "Who wrote 'Romeo and Juliet'?",
-        "options": ["Shakespeare", "Hemingway", "Tolstoy", "Dickens"],
-        "answer": "Shakespeare"
+        "question": "Which company developed the Windows operating system?",
+        "options": ["Apple", "Microsoft", "Google", "IBM"],
+        "answer": "Microsoft"
     },
     {
-        "question": "What is the chemical symbol for water?",
-        "options": ["H2O", "CO2", "NaCl", "O2"],
-        "answer": "H2O"
+        "question": "What does HTTP stand for?",
+        "options": ["HyperText Transfer Protocol", "High Transfer Text Program", "Host Transfer Protocol", "Hyper Transfer Tool Package"],
+        "answer": "HyperText Transfer Protocol"
     },
     {
-        "question": "Which planet is known as the Red Planet?",
-        "options": ["Mars", "Venus", "Jupiter", "Mercury"],
-        "answer": "Mars"
+        "question": "Which of the following is a database system?",
+        "options": ["MySQL", "Python", "HTML", "Linux"],
+        "answer": "MySQL"
     },
     {
-        "question": "How many continents are there on Earth?",
-        "options": ["5", "6", "7", "8"],
-        "answer": "7"
+        "question": "What is the correct file extension for a Python file?",
+        "options": [".py", ".java", ".html", ".exe"],
+        "answer": ".py"
     },
     {
-        "question": "What is the smallest prime number?",
-        "options": ["0", "1", "2", "3"],
-        "answer": "2"
+        "question": "Which device is used to store data permanently?",
+        "options": ["RAM", "CPU", "Hard Drive", "Cache"],
+        "answer": "Hard Drive"
     },
     {
-        "question": "Which organ pumps blood through the body?",
-        "options": ["Liver", "Heart", "Kidney", "Lung"],
-        "answer": "Heart"
+        "question": "What does GUI stand for?",
+        "options": ["Graphical User Interface", "General User Input", "Global User Interaction", "Graphic Utility Interface"],
+        "answer": "Graphical User Interface"
     },
     {
-        "question": "Which is the fastest land animal?",
-        "options": ["Cheetah", "Lion", "Horse", "Tiger"],
-        "answer": "Cheetah"
+        "question": "Which operating system is open-source?",
+        "options": ["Windows", "macOS", "Linux", "iOS"],
+        "answer": "Linux"
     },
     {
-        "question": "What gas do plants absorb from the air?",
-        "options": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Helium"],
-        "answer": "Carbon Dioxide"
+        "question": "What is the purpose of a firewall?",
+        "options": ["Increase internet speed", "Protect a network", "Store data", "Run applications"],
+        "answer": "Protect a network"
     },
 ]
 
