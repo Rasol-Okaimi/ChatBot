@@ -61,14 +61,14 @@ def show_result_on_sensehat(is_correct):
         return
 
     if is_correct:
-        sense.show_letter("✔", text_colour=GREEN)
+        sense.show_letter("T", text_colour=GREEN)
     else:
-        sense.show_letter("✘", text_colour=RED)
+        sense.show_letter("F", text_colour=RED)
     _safe_sleep(1)  # Keep the symbol visible for 1 second
     _safe_clear()
 
 # Trivia exit game -     Displays a symbol when exiting the trivia game.
-                    #Optionally shows the player's score before the exit symbol.
+                         #shows the player's score before the exit symbol.
 def show_game_exit_symbol(score=None):
     if not SENSE_AVAILABLE:
         return

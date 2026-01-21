@@ -34,10 +34,10 @@
         "Berlin is the capital city of Germany.",
         "Germany's capital is Berlin."
     ],
-    "who created you": [
-        "I was created by a developer using Python.",
-        "I was developed using Python!",
-        "A Python developer brought me to life!"
+    "what can you do with python": [
+        "Python created to develop Apps using Python.",
+        "It was developed for software!",
+        "A Python developer used python!"
     ],
     "who created python": [
         "Guido van Rossum created Python."

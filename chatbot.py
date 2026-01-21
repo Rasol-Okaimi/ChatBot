@@ -3,6 +3,7 @@ import re  # For regex splitting compound questions
 import sys
 import random
 import logging
+import threading
 import subprocess
 import logging
 import time  # Sense HAT
@@ -64,6 +65,10 @@ question_variants = {
 }
 
 last_suggestions = []
+last_input_time = time.time()  # Last user entry time
+
+IDLE_TIMEOUT = 60  # seconds of inactivity required before temperature display
+temperature_shown = False
 
 #Extract location and date from user input + Returns (location, date)
 def extract_location_and_date(user_input):
@@ -172,44 +177,35 @@ def suggest_questions(keyword):
     return None
 
 #Display temperature on Sense HAT LED matrix.
-def display_temperature_on_sensehat(temp_celsius):
-    if sense is None:
-        return
+def temperature_display_loop():
+    global last_input_time, temperature_shown
 
-    text = f"{temp_celsius:.1f}C"
-    sense.show_message(text, scroll_speed=0.05, text_colour=[255, 0, 0])
+    while True:
+        idle_duration = time.time() - last_input_time
+
+        if idle_duration >= IDLE_TIMEOUT and not temperature_shown:
+            try:
+                print(f"{get_time()} Idle mode → Display temperature")
+                show_temperature()
+                temperature_shown = True
+                print(f"{get_time()} You: ", end="", flush=True)
+            except Exception as e:
+                logging.warning(f"Failed to display temperature: {e}")
+
+        time.sleep(1)  # time check for display temperature
 
 def interactive_chat():
+    global last_suggestions, last_input_time, temperature_shown
     print(f"{get_time()} Chatbot: Hello!")
     print(f"{get_time()} Chatbot: How can I help you?")
 
-    global last_suggestions
-
-    last_display_time = 0
-    display_interval = 60  # Display temp every 60 sec
-    last_input_time = time.time() # Record startup time as last input time  (idle time)
-
     while True:
-        current_time = time.time()
-
-        # Sense HAT Display temp - mode (idle)
-        # Temperature displayed if user does not enter anything during the specified period.
-        if (time.time() - last_input_time) > display_interval:
-            # To avoid repetition, display each display_interval for minimum one second.
-            if (time.time() - last_display_time) > display_interval:
-                try:
-                    show_temperature()
-                    last_display_time = current_time
-                except Exception as e:
-                    logging.warning(f"Failed to read/display temperature on Sense HAT: {e}")
-
         try:
             user_input = input(f"{get_time()} You: ").strip()
+            last_input_time = time.time()
+            temperature_shown = False
         except EOFError:
             break
-
-        ## When the user enters-update last input time ->> user is active.
-        last_input_time = time.time()
 
         # Sense HAT - user input , clear screen
         if sense is not None:
@@ -260,7 +256,14 @@ def cli_mode(question):
     print(f"{get_time()} {response}")
 
 if __name__ == "__main__":
-    show_startup_symbol()  #30 Display the app start code
+    show_startup_symbol()  # 30 Display the app start code
     from cli_handler import handle_cli_args
     handle_cli_args()  # handle CLI commands first
+
+    if sense is not None:
+        # temperature display
+        #print("Starting temperature display ...")
+        temp_thread = threading.Thread(target=temperature_display_loop, daemon=True)
+        temp_thread.start()
+
     interactive_chat()  # fallback to interactive chat if no CLI commands
