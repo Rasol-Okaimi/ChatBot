@@ -6,7 +6,8 @@
     ],
     "hello": [
         "Hello!",
-        "Hi there!"
+        "Hi there!",
+        "Greetings!"
     ],
     "what is your name": [
         "I am Chatbot Group 7.",
@@ -26,51 +27,59 @@
     "what is the capital of france": [
         "The capital of France is Paris.",
         "Paris is the capital city of France.",
-        "France’s capital is Paris."
+        "France's capital is Paris."
     ],
     "what is the capital of germany": [
         "The capital of Germany is Berlin.",
         "Berlin is the capital city of Germany.",
-        "Germany’s capital is Berlin."
+        "Germany's capital is Berlin."
     ],
     "who created you": [
         "I was created by a developer using Python.",
         "I was developed using Python!",
         "A Python developer brought me to life!"
     ],
-    "what can you do with python": [
-        "I can answer basic questions and chat with you!",
-        "I am here to help you!",
-        "I’m able to respond to simple questions and keep you company!"
+    "who created python": [
+        "Guido van Rossum created Python."
     ],
     "what is 2 plus 2": [
+        "The answer is 4.",
         "2 plus 2 equals 4.",
-        "4 is the answer.",
-        "The answer is 4."
+        "4 is the answer."
+    ],
+    "what is ai": [
+        "AI means Artificial Intelligence.",
+        "AI lets computers learn.",
+        "AI is technology that makes machines act smart.",
+        "AI is a system that can solve problems on its own."
+    ],
+    "what is a variable": [
+        "A variable stores data.",
+        "It holds a value."
+    ],
+    "what is a loop": [
+        "A loop repeats code.",
+        "A loop runs the same code again and again until a condition is met."
+    ],
+    "what is html": [
+        "HTML builds webpages.",
+        "It is a markup language."
+    ],
+    "what is an api": [
+        "An API lets programs talk to each other.",
+        "An API is a set of rules for how software can share data.",
+        "An API lets apps connect and work together.",
+        "An API is like a menu that tells you what a software service can do."
+    ],
+    "what is a function": [
+        "A function is reusable code.",
+        "A function takes input, does work, and can return a result.",
+        "A function helps organize code into smaller tasks.",
+        "A function lets you avoid repeating the same code."
     ],
     "what is the largest planet": [
         "Jupiter is the largest planet in our solar system.",
-        "The largest planet is Jupiter.",
-        "The biggest planet in our solar system is Jupiter."
-    ],
-    "who is the president of the usa": [
-        "As of 2025, the President of the USA is Donald Trump.",
-        "The President of the USA is Donald Trump.",
-        "Donald Trump is the current President of the United States (2025)."
-    ],
-    "who is the president of america": [
-        "As of 2025, the President of the USA is Donald Trump.",
-        "The President of the USA is Donald Trump."
-    ],
-    "what is the tallest mountain": [
-        "Mount Everest is the tallest mountain in the world.",
-        "Everest is the tallest mountain in the world.",
-        "Everest is the highest mountain above sea level."
-    ],
-    "what is ai": [
-        "AI stands for Artificial Intelligence."
-    ],
-    "what is cpu": [
-        "CPU Computer Unit."
+        "The biggest planet in our solar system is Jupiter.",
+        "The largest planet is Jupiter."
     ]
 }

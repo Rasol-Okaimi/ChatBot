@@ -103,4 +103,4 @@ def handle_cli_args():
         cli_mode(args.question)
         sys.exit(0)
 
-    # If no recognized CLI command, simply return to fallback interactive mode
+    # If no recognized CLI command - return to interactive mode

@@ -15,12 +15,12 @@ locations_events = {
     },
     "research conference": {
         "location": "braunschweig",
-        "event_date": "2026-02-20",
+        "event_date": "2026-01-24",
         "description": "Held at the Braunschweig Conference Center, Hall B."
     },
     "university seminar": {
         "location": "goslar",
-         "event_date": "2026-01-12",
+         "event_date": "2026-01-23",
         "description": "Seminar room in the historic Goslar campus ,Hall C."
     },
     "when is university seminar": {

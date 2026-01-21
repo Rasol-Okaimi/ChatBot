@@ -1,56 +1,98 @@
-#  Run without debug
-python chatbot.py --test
-#  Run debug
-python chatbot.py --test --debug
+scp -r ChatBot1 group7@192.168.178.131:/home/group7/
+sudo raspi-config
 
+#28 - Visual progress indicator for built-in trivia game
+#29 - Display temperature via LED panel and update the value
+#30 - Visual status indicator for the app
+
+#21 Add a logging feature
 python chatbot.py --log
 python chatbot.py --log --log-level INFO
 python chatbot.py --log --log-level INFO --question "what is python"
 python chatbot.py --log --question "unknown question"
 
+#22 - Add help message/argument
 python chatbot.py --help
 python chatbot.py --helo
 python chatbot.py --help --log
+python chatbot.py --help --l
 
+#23 Create base built-in trivia game + #24 Progress indicator
 Trivia
 
-#  weather
+#25 Get weather forecast
+
 lecture hall a
 research conference
 What is the weather in Goslar?
 university seminar
 What is the weather in Wolfenbüttel?
-Tell me about the event location at Goslar.
 Where is the lecture hall in Berlin on 2026-01-10?
 What will be the weather in Wolfenbüttel on 2026-01-12?
 "What is the weather in Hamburg?" xxxx
 
-# Import CSV
-python chatbot.py --import --filetype CSV --filepath question.csv
+---------------------------------
 
+#15 Add support for Q&A CSV import
+# Import CSV
+python chatbot.py --import --filetype CSV --filepath questions.csv
+
+#16
+Allow service-provider to list all questions
 # question-list
 python chatbot.py --list
 
-# import CSV (wrong path error CSV)
-python chatbot.py --import --filetype CSV --filepath "path\to\your\questions.csv"
 
-# new csv question
-python chatbot.py --add --question "what is AI" --answer "AI stands for Artificial Intelligence."
+#17- 18 - Allows the service-provider to add and remove questions
+
+#add question or Answers
 python chatbot.py --add --question "what is CPU" --answer "CPU Computer Unit."
-#
-python chatbot.py --add --question "what is python" --answer "Python is also used for AI and data science."
+python chatbot.py --add --question "what is CPU" --answer "CPU main Unit."
 
 #delete question
 python chatbot.py --remove --question "what is AI"
 
 #delete answer from question
-python chatbot.py --remove --question "what is python" --answer "Python is a powerful and easy-to-learn programming language."
+python chatbot.py --remove --question "what is ai" --answer "AI is new Technology."
 
-# list of question
-python chatbot.py --list
 
+#19
+Gracefully handle possible crashes
+# import CSV (wrong path error CSV)
+python chatbot.py --import --filetype CSV --filepath "path\to\your\questions.csv"
+
+#20
+Add built-in self-test
+
+#  Run without debug
+python chatbot.py --test
+#  Run debug
+python chatbot.py --test --debug
+
+--------------------------------
+#14
+Handle multiple variations of the same question
+what do you mean by python programming
+
+#13
+Compound questions
+what is python and who created you
+
+12 Suggest possible questions based on specific keywords
+python
+
+
+##11 Allow the service-provider to add multiple answers for the same question
+what is python
+what is python
+
+
+#9
+Allow users to ask questions via command line arguments
 # direct question CLI mode
 python chatbot.py --question "what is python"
+python chatbot.py --question "what is a loop"
+what is a loop
 
 
 

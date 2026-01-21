@@ -99,7 +99,7 @@ def load_questions_from_file(filepath="chat_questions.json"):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             chat_questions = json.load(f)
-        print(f"{get_time()} Chatbot: Loaded questions from {filepath}")
+        #print(f"{get_time()} Chatbot: Loaded questions from {filepath}")
     except FileNotFoundError:
         print(f"{get_time()} Chatbot: No saved questions file found, starting fresh.")
         chat_questions = {}
@@ -108,6 +108,7 @@ def load_questions_from_file(filepath="chat_questions.json"):
         chat_questions = {}
 
 def import_csv(filepath):
+    #from chatbot import interactive_chat
     logging.info(f"Attempting CSV import: {filepath}")
     global chat_questions
     print(f"{get_time()} Chatbot: Starting CSV import...")
@@ -144,6 +145,8 @@ def import_csv(filepath):
         chat_questions = new_data
         logging.info("CSV import successful")
         print(f"{get_time()} Chatbot: CSV imported successfully! {len(chat_questions)} questions loaded.")
+        save_questions_to_file()
+        #interactive_chat()
 
     except PermissionError:
         print(f"{get_time()} WARNING: Permission denied for file: {filepath}")

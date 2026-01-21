@@ -2,11 +2,15 @@ import os
 import re  # For regex splitting compound questions
 import sys
 import random
+import logging
 import subprocess
 import logging
+import time  # Sense HAT
+
 from trivia_game import play_trivia
 from utils import HELP_TEXT, get_time
 from weather_app import locations_events, get_current_weather, get_forecast_weather
+
 from questions_handler import (
     chat_questions,
     add_question,
@@ -16,6 +20,23 @@ from questions_handler import (
     import_csv,
     save_questions_to_file,
 )
+
+from display import (
+    show_startup_symbol,
+    show_game_start_symbol,
+    show_temperature,
+    show_game_exit_symbol
+)
+
+# Allows the app to run even without Sense HAT
+try:
+    from sense_hat import SenseHat
+    sense = SenseHat()
+    sense.clear()
+except ImportError:
+    sense = None
+    #print("Unable to find Sense HAT library — LED display will be disabled")
+
 
 keyword_suggestions = {
     "python": [
@@ -44,11 +65,8 @@ question_variants = {
 
 last_suggestions = []
 
+#Extract location and date from user input + Returns (location, date)
 def extract_location_and_date(user_input):
-    """
-    Extract location and date from user input.
-    Returns (location, date)
-    """
     date_match = re.search(r"\d{4}-\d{2}-\d{2}", user_input)
     event_date = date_match.group() if date_match else None
 
@@ -153,17 +171,49 @@ def suggest_questions(keyword):
         return keyword_suggestions[keyword]
     return None
 
+#Display temperature on Sense HAT LED matrix.
+def display_temperature_on_sensehat(temp_celsius):
+    if sense is None:
+        return
+
+    text = f"{temp_celsius:.1f}C"
+    sense.show_message(text, scroll_speed=0.05, text_colour=[255, 0, 0])
+
 def interactive_chat():
     print(f"{get_time()} Chatbot: Hello!")
     print(f"{get_time()} Chatbot: How can I help you?")
 
     global last_suggestions
 
+    last_display_time = 0
+    display_interval = 60  # Display temp every 60 sec
+    last_input_time = time.time() # Record startup time as last input time  (idle time)
+
     while True:
+        current_time = time.time()
+
+        # Sense HAT Display temp - mode (idle)
+        # Temperature displayed if user does not enter anything during the specified period.
+        if (time.time() - last_input_time) > display_interval:
+            # To avoid repetition, display each display_interval for minimum one second.
+            if (time.time() - last_display_time) > display_interval:
+                try:
+                    show_temperature()
+                    last_display_time = current_time
+                except Exception as e:
+                    logging.warning(f"Failed to read/display temperature on Sense HAT: {e}")
+
         try:
             user_input = input(f"{get_time()} You: ").strip()
         except EOFError:
             break
+
+        ## When the user enters-update last input time ->> user is active.
+        last_input_time = time.time()
+
+        # Sense HAT - user input , clear screen
+        if sense is not None:
+            sense.clear()
 
         if not user_input:
             continue
@@ -174,7 +224,9 @@ def interactive_chat():
             break
 
         if user_input.lower() == "trivia":
-            play_trivia()
+            show_game_start_symbol()  #30 game start code
+            score = play_trivia()       # trivia return  result
+            show_game_exit_symbol(score)  #30 Game end displayed with score
             continue
 
         if user_input.isdigit() and last_suggestions:
@@ -208,6 +260,7 @@ def cli_mode(question):
     print(f"{get_time()} {response}")
 
 if __name__ == "__main__":
+    show_startup_symbol()  #30 Display the app start code
     from cli_handler import handle_cli_args
     handle_cli_args()  # handle CLI commands first
     interactive_chat()  # fallback to interactive chat if no CLI commands
