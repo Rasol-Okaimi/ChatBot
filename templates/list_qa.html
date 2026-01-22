@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List Questions & Answers</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #007BFF; color: white; }
+    </style>
+</head>
+<body>
+    <h2>List of Questions & Answers</h2>
+    <table>
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+        {% for qa in qa_list %}
+        <tr>
+            <td>{{ qa.question }}</td>
+            <td>{{ qa.answer }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="/">Back to Dashboard</a></p>
+</body>
+</html>

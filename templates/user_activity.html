@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Activity</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #007BFF; color: white; }
+    </style>
+</head>
+<body>
+    <h2>User Activity</h2>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Status</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.activity }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="/">Back to Dashboard</a></p>
+</body>
+</html>

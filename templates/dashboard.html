@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .container {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .card a:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: #777;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Admin Dashboard – Chatbot Management
+</header>
+
+<div class="container">
+    <div class="card">
+        <h3>List Questions & Answers</h3>
+        <a href="/list-qa">View Q&A</a>
+    </div>
+
+    <div class="card">
+        <h3>Edit Questions & Answers</h3>
+        <a href="/edit-qa">Edit Q&A</a>
+    </div>
+
+    <div class="card">
+        <h3>Application Logs</h3>
+        <br>
+        <a href="/logs">View Logs</a>
+    </div>
+
+    <div class="card">
+        <h3>List Users</h3>
+        <br>
+        <a href="/users">View Users</a>
+    </div>
+
+    <div class="card">
+        <h3>User Activity</h3>
+        <br>
+        <a href="/activity">View Activity</a>
+    </div>
+</div>
+
+<footer>
+    Chatbot Admin Panel © 2026
+</footer>
+
+</body>
+</html>

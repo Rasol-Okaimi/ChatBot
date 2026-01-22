@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Logs</title>
+    <br>
+
+    <br>
+
+<br>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+        pre {
+            background-color: #f4f6f8;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Application Logs</h2>
+
+<pre>
+{% for line in logs %}
+{{ line }}
+{% endfor %}
+</pre>
+
+<br>
+<a href="{{ url_for('clear_logs') }}">Clear Logs</a>
+
+<br>
+
+<br>
+<a href="/">Back to Dashboard</a>
+
+</body>
+</html>

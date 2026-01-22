@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Web App</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f8; padding: 20px; }
+        #chat-box { border: 1px solid #ccc; padding: 10px; width: 400px; height: 300px; overflow-y: scroll; background: white; }
+        #user-input { width: 300px; padding: 5px; }
+        #send-btn { padding: 5px 10px; }
+        .message { margin: 5px 0; }
+        .user { color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+
+<h2>Chat with Bot</h2>
+
+<div id="chat-box"></div>
+
+<input type="text" id="user-input" placeholder="Type your message...">
+<button id="send-btn">Send</button>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+
+function appendMessage(sender, text) {
+    const div = document.createElement("div");
+    div.classList.add("message");
+    div.classList.add(sender);
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+sendBtn.addEventListener("click", function() {
+    const message = userInput.value.trim();
+    if (message === "") return;
+    appendMessage("user", "You: " + message);
+    userInput.value = "";
+
+    fetch("/send_message", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "message=" + encodeURIComponent(message)
+    })
+    .then(response => response.json())
+    .then(data => appendMessage("bot", "Bot: " + data.response));
+});
+
+userInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendBtn.click();
+});
+</script>
+
+</body>
+</html>

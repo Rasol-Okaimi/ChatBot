@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Questions & Answers</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+        input {
+            width: 300px;
+            padding: 5px;
+        }
+        button {
+            padding: 6px 12px;
+            margin-top: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            width: 80%;
+        }
+        table, th, td {
+            border: 1px solid #aaa;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Edit Questions & Answers</h2>
+
+<form method="POST">
+    <label>Question:</label><br>
+    <input type="text" name="question" required><br><br>
+
+    <label>Answer:</label><br>
+    <input type="text" name="answer" required><br><br>
+
+    <button type="submit">Add Question</button>
+</form>
+
+<h3>Existing Questions & Answers</h3>
+
+<table>
+    <tr>
+        <th>Question</th>
+        <th>Answer</th>
+    </tr>
+    {% for qa in qa_list %}
+    <tr>
+        <td>{{ qa.question }}</td>
+        <td>{{ qa.answer }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/">Back to Dashboard</a>
+
+</body>
+</html>
