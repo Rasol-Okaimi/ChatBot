@@ -6,7 +6,7 @@ import logging
 import threading
 import subprocess
 import time  # Sense HAT
-from datetime import datetime  # ✅ needed for timestamp filenames
+from datetime import datetime  # needed for timestamp filenames
 
 from trivia_game import play_trivia
 from utils import HELP_TEXT, get_time
@@ -63,11 +63,17 @@ question_variants = {
     "what is python language": "what is python",
 }
 
+# ---- Idle / Suggestions settings ----
 last_suggestions = []
-last_input_time = time.time()  # Last user entry time
-
-IDLE_TIMEOUT = 60  # seconds of inactivity required before temperature display
+last_input_time = time.time()  # last user entry time
+IDLE_TIMEOUT = 60              # show temperature after 60s inactivity
 temperature_shown = False
+
+SUGGESTION_IDLE_TIMEOUT = 30   # ✅ suggest tips/questions after 30s inactivity
+suggestions_shown = False      # ✅ prevents repeating suggestions every second
+
+# store recent user messages for better suggestions
+recent_user_inputs = []        # ✅ keep last few questions asked
 
 
 def save_chat_log(chat_log, directory="chat_logs"):
@@ -199,29 +205,96 @@ def suggest_questions(keyword):
     return None
 
 
-# Display temperature on Sense HAT LED matrix.
+# ✅ NEW: Suggest tips/questions based on recent chat activity
+def get_idle_suggestions():
+    tips = [
+        "Tip: Type 'trivia' to play the trivia game.",
+        "Tip: Type 'save log' to download your chat as a file.",
+        "Tip: Ask weather like: 'Berlin' or 'Berlin 2026-02-10'.",
+        "Tip: You can ask multiple questions like: 'what is python and what is the largest planet?'",
+        "Tip: Type 'bye' to exit."
+    ]
+
+    # activity-based suggestions (based on recent messages)
+    activity_based = []
+
+    if recent_user_inputs:
+        last_msg = recent_user_inputs[-1].lower()
+
+        if "python" in last_msg:
+            activity_based += [
+                "You were asking about Python — try: 'what can you do with python'",
+                "Or ask: 'what is python'"
+            ]
+        if "weather" in last_msg or any(city.lower() in last_msg for city in ["berlin", "london", "paris"]):
+            activity_based += [
+                "Try asking: 'Berlin 2026-02-10' for a forecast date format (YYYY-MM-DD).",
+                "Or ask: 'Berlin' for current weather."
+            ]
+        if "president" in last_msg:
+            activity_based += [
+                "Try: 'who is the president of the usa'",
+                "Or: 'who is the president of America'"
+            ]
+
+    # fallback: suggest a few known question prompts
+    fallback_questions = [
+        "Try asking: 'what is python'",
+        "Try asking: 'what is the tallest mountain'",
+        "Try asking: 'what is the largest planet'"
+    ]
+
+    suggestions = []
+    suggestions.extend(activity_based[:2])
+    suggestions.extend(random.sample(tips, k=min(2, len(tips))))
+    suggestions.extend(random.sample(fallback_questions, k=min(2, len(fallback_questions))))
+
+    # remove duplicates while keeping order
+    seen = set()
+    final = []
+    for s in suggestions:
+        if s not in seen:
+            seen.add(s)
+            final.append(s)
+
+    return final
+
+
+# Display temperature on Sense HAT LED matrix + show idle suggestions
 def temperature_display_loop():
-    global last_input_time, temperature_shown
+    global last_input_time, temperature_shown, suggestions_shown
 
     while True:
         idle_duration = time.time() - last_input_time
 
+        # ✅ 30s idle: show tips/questions
+        if idle_duration >= SUGGESTION_IDLE_TIMEOUT and not suggestions_shown:
+            try:
+                print(f"\n{get_time()} Chatbot: You seem idle. Here are some tips/questions:")
+                for s in get_idle_suggestions():
+                    print(f"{get_time()} Chatbot: {s}")
+                print(f"{get_time()} You: ", end="", flush=True)
+                suggestions_shown = True
+            except Exception as e:
+                logging.warning(f"Failed to show idle suggestions: {e}")
+
+        # ✅ 60s idle: show temperature
         if idle_duration >= IDLE_TIMEOUT and not temperature_shown:
             try:
-                print(f"{get_time()} Idle mode → Display temperature")
+                print(f"\n{get_time()} Idle mode → Display temperature")
                 show_temperature()
                 temperature_shown = True
                 print(f"{get_time()} You: ", end="", flush=True)
             except Exception as e:
                 logging.warning(f"Failed to display temperature: {e}")
 
-        time.sleep(1)  # time check for display temperature
+        time.sleep(1)
 
 
 def interactive_chat():
-    global last_suggestions, last_input_time, temperature_shown
+    global last_suggestions, last_input_time, temperature_shown, suggestions_shown
 
-    chat_log = []  # ✅ stores conversation lines
+    chat_log = []
 
     print(f"{get_time()} Chatbot: Hello!")
     print(f"{get_time()} Chatbot: How can I help you?")
@@ -232,8 +305,11 @@ def interactive_chat():
     while True:
         try:
             user_input = input(f"{get_time()} You: ").strip()
+
             last_input_time = time.time()
             temperature_shown = False
+            suggestions_shown = False  # ✅ reset suggestion flag when user types
+
         except EOFError:
             break
 
@@ -243,7 +319,12 @@ def interactive_chat():
         if not user_input:
             continue
 
-        # ✅ download / save chat log
+        # track recent user questions
+        recent_user_inputs.append(user_input)
+        if len(recent_user_inputs) > 5:
+            recent_user_inputs.pop(0)
+
+        # download / save chat log
         if user_input.lower() in ["download", "download log", "save", "save log"]:
             if not chat_log:
                 print(f"{get_time()} Chatbot: Chat log is empty. Nothing to download.")
@@ -318,13 +399,13 @@ def cli_mode(question):
 
 
 if __name__ == "__main__":
-    show_startup_symbol()  # Display the app start code
+    show_startup_symbol()
 
     from cli_handler import handle_cli_args
-    handle_cli_args()  # handle CLI commands first
+    handle_cli_args()
 
-    if sense is not None:
-        temp_thread = threading.Thread(target=temperature_display_loop, daemon=True)
-        temp_thread.start()
+    # start idle loop thread (works even without Sense HAT)
+    temp_thread = threading.Thread(target=temperature_display_loop, daemon=True)
+    temp_thread.start()
 
-    interactive_chat()  # fallback to interactive chat if no CLI commands
+    interactive_chat()
