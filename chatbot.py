@@ -70,6 +70,23 @@ last_input_time = time.time()  # Last user entry time
 IDLE_TIMEOUT = 60  # seconds of inactivity required before temperature display
 temperature_shown = False
 
+def save_chat_log(chat_log, directory="."):
+    """Save chat log into a timestamped .txt file.
+    Filename format: chat-log-YYYY-MM-DD-HH-MM.txt
+    Returns the saved file path, or None if nothing was saved.
+    """
+    if not chat_log:
+        return None
+
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    filename = f"chat-log-{timestamp}.txt"
+    filepath = os.path.join(directory, filename)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("\n".join(chat_log).strip() + "\n")
+
+    return filepath
+
 #Extract location and date from user input + Returns (location, date)
 def extract_location_and_date(user_input):
     date_match = re.search(r"\d{4}-\d{2}-\d{2}", user_input)
@@ -206,6 +223,13 @@ def interactive_chat():
             temperature_shown = False
         except EOFError:
             break
+        
+         if user_input.lower() in ["download", "download log", "save", "save log"]:
+            if not chat_log:
+                print(f"{get_time()} Chatbot: Chat log is empty. Nothing to download.")
+           
+            continue
+
 
         # Sense HAT - user input , clear screen
         if sense is not None:
