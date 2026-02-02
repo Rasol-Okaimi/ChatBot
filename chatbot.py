@@ -5,8 +5,8 @@ import random
 import logging
 import threading
 import subprocess
-import logging
 import time  # Sense HAT
+from datetime import datetime  # ✅ needed for timestamp filenames
 
 from trivia_game import play_trivia
 from utils import HELP_TEXT, get_time
@@ -36,7 +36,6 @@ try:
     sense.clear()
 except ImportError:
     sense = None
-    #print("Unable to find Sense HAT library — LED display will be disabled")
 
 
 keyword_suggestions = {
@@ -70,13 +69,16 @@ last_input_time = time.time()  # Last user entry time
 IDLE_TIMEOUT = 60  # seconds of inactivity required before temperature display
 temperature_shown = False
 
-def save_chat_log(chat_log, directory="."):
+
+def save_chat_log(chat_log, directory="chat_logs"):
     """Save chat log into a timestamped .txt file.
     Filename format: chat-log-YYYY-MM-DD-HH-MM.txt
     Returns the saved file path, or None if nothing was saved.
     """
     if not chat_log:
         return None
+
+    os.makedirs(directory, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M")
     filename = f"chat-log-{timestamp}.txt"
@@ -87,7 +89,8 @@ def save_chat_log(chat_log, directory="."):
 
     return filepath
 
-#Extract location and date from user input + Returns (location, date)
+
+# Extract location and date from user input + Returns (location, date)
 def extract_location_and_date(user_input):
     date_match = re.search(r"\d{4}-\d{2}-\d{2}", user_input)
     event_date = date_match.group() if date_match else None
@@ -105,6 +108,7 @@ def extract_location_and_date(user_input):
             break
 
     return location, event_date
+
 
 def chatbot_response(user_input):
     logging.info(f"User asked: {user_input}")
@@ -187,13 +191,15 @@ def chatbot_response(user_input):
     else:
         return "Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question."
 
+
 def suggest_questions(keyword):
     keyword = keyword.lower()
     if keyword in keyword_suggestions:
         return keyword_suggestions[keyword]
     return None
 
-#Display temperature on Sense HAT LED matrix.
+
+# Display temperature on Sense HAT LED matrix.
 def temperature_display_loop():
     global last_input_time, temperature_shown
 
@@ -211,10 +217,17 @@ def temperature_display_loop():
 
         time.sleep(1)  # time check for display temperature
 
+
 def interactive_chat():
     global last_suggestions, last_input_time, temperature_shown
+
+    chat_log = []  # ✅ stores conversation lines
+
     print(f"{get_time()} Chatbot: Hello!")
     print(f"{get_time()} Chatbot: How can I help you?")
+
+    chat_log.append(f"{get_time()} Chatbot: Hello!")
+    chat_log.append(f"{get_time()} Chatbot: How can I help you?")
 
     while True:
         try:
@@ -223,30 +236,43 @@ def interactive_chat():
             temperature_shown = False
         except EOFError:
             break
-        
-         if user_input.lower() in ["download", "download log", "save", "save log"]:
-            if not chat_log:
-                print(f"{get_time()} Chatbot: Chat log is empty. Nothing to download.")
-           
-            continue
 
-
-        # Sense HAT - user input , clear screen
         if sense is not None:
             sense.clear()
 
         if not user_input:
             continue
 
+        # ✅ download / save chat log
+        if user_input.lower() in ["download", "download log", "save", "save log"]:
+            if not chat_log:
+                print(f"{get_time()} Chatbot: Chat log is empty. Nothing to download.")
+            else:
+                try:
+                    saved_path = save_chat_log(chat_log)
+                    print(f"{get_time()} Chatbot: Chat log saved to: {saved_path}")
+                    chat_log.append(f"{get_time()} Chatbot: Chat log saved to: {saved_path}")
+                except Exception as e:
+                    print(f"{get_time()} Chatbot: Failed to save chat log: {e}")
+                    chat_log.append(f"{get_time()} Chatbot: Failed to save chat log: {e}")
+            continue
+
+        chat_log.append(f"{get_time()} You: {user_input}")
+
         if user_input.lower() in ["bye", "exit", "quit"]:
             logging.info("User exited application")
-            print(f"{get_time()} Chatbot: Goodbye! Have a great day!")
+            bye_msg = "Chatbot: Goodbye! Have a great day!"
+            print(f"{get_time()} {bye_msg}")
+            chat_log.append(f"{get_time()} {bye_msg}")
             break
 
         if user_input.lower() == "trivia":
-            show_game_start_symbol()  #30 game start code
-            score = play_trivia()       # trivia return  result
-            show_game_exit_symbol(score)  #30 Game end displayed with score
+            show_game_start_symbol()
+            score = play_trivia()
+            show_game_exit_symbol(score)
+            bot_msg = f"Chatbot: Trivia finished! Your score was {score}."
+            print(f"{get_time()} {bot_msg}")
+            chat_log.append(f"{get_time()} {bot_msg}")
             continue
 
         if user_input.isdigit() and last_suggestions:
@@ -255,38 +281,49 @@ def interactive_chat():
                 selected_question = last_suggestions[choice - 1]
                 response = chatbot_response(selected_question)
                 print(f"{get_time()} {response}")
+                chat_log.append(f"{get_time()} {response}")
                 last_suggestions = []
                 continue
             else:
-                print(f"{get_time()} Chatbot: Invalid question number. Please try again.")
+                msg = "Chatbot: Invalid question number. Please try again."
+                print(f"{get_time()} {msg}")
+                chat_log.append(f"{get_time()} {msg}")
                 continue
 
         suggestions = suggest_questions(user_input)
         if suggestions:
             last_suggestions = suggestions
             print(f"{get_time()} Chatbot: You might want to ask:")
+            chat_log.append(f"{get_time()} Chatbot: You might want to ask:")
+
             for i, q in enumerate(suggestions, 1):
                 print(f"  {i}. {q}")
-            print(f"{get_time()} Chatbot: Please type the number of your question choice.")
+                chat_log.append(f"{get_time()}   {i}. {q}")
+
+            msg = "Chatbot: Please type the number of your question choice."
+            print(f"{get_time()} {msg}")
+            chat_log.append(f"{get_time()} {msg}")
             continue
 
         last_suggestions = []
 
         response = chatbot_response(user_input)
         print(f"{get_time()} {response}")
+        chat_log.append(f"{get_time()} {response}")
+
 
 def cli_mode(question):
     response = chatbot_response(question)
     print(f"{get_time()} {response}")
 
+
 if __name__ == "__main__":
-    show_startup_symbol()  # 30 Display the app start code
+    show_startup_symbol()  # Display the app start code
+
     from cli_handler import handle_cli_args
     handle_cli_args()  # handle CLI commands first
 
     if sense is not None:
-        # temperature display
-        #print("Starting temperature display ...")
         temp_thread = threading.Thread(target=temperature_display_loop, daemon=True)
         temp_thread.start()
 
