@@ -1,0 +1,10 @@
+2026-02-04 18:37:52,417 - INFO - 127.0.0.1 - - [04/Feb/2026 18:37:52] "[32mGET /clear-logs HTTP/1.1[0m" 302 -
+2026-02-04 18:37:52,445 - INFO - 127.0.0.1 - - [04/Feb/2026 18:37:52] "GET /logs HTTP/1.1" 200 -
+2026-02-04 18:37:53,959 - INFO - 127.0.0.1 - - [04/Feb/2026 18:37:53] "GET / HTTP/1.1" 200 -
+2026-02-04 18:37:55,371 - INFO - 127.0.0.1 - - [04/Feb/2026 18:37:55] "GET /logs HTTP/1.1" 200 -
+2026-02-04 18:38:07,440 - INFO - 127.0.0.1 - - [04/Feb/2026 18:38:07] "GET / HTTP/1.1" 200 -
+2026-02-04 18:38:08,903 - INFO - 127.0.0.1 - - [04/Feb/2026 18:38:08] "GET /edit-qa HTTP/1.1" 200 -
+2026-02-04 18:47:05,047 - INFO -  * Detected change in 'C:\\Users\\HP\\PycharmProjects\\ChatBot1\\chatbot.py', reloading
+2026-02-04 18:47:05,112 - INFO -  * Restarting with stat
+2026-02-04 18:47:05,859 - WARNING -  * Debugger is active!
+2026-02-04 18:47:05,871 - INFO -  * Debugger PIN: 131-151-140

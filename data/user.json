@@ -1,0 +1,17 @@
+[
+  {
+    "username": "ali",
+    "email": "ali@example.com",
+    "status": "Active"
+  },
+  {
+    "username": "sarah",
+    "email": "sarah@example.com",
+    "status": "Inactive"
+  },
+    {
+    "username": "sam",
+    "email": "sam@example.com",
+    "status": "Inactive"
+  }
+]

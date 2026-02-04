@@ -1,46 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title>Edit Questions & Answers</title>
     <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
-        input {
-            width: 300px;
-            padding: 5px;
-        }
-        button {
-            padding: 6px 12px;
-            margin-top: 10px;
-        }
-        table {
-            border-collapse: collapse;
-            margin-top: 20px;
-            width: 80%;
-        }
-        table, th, td {
-            border: 1px solid #aaa;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
+        body { font-family: Arial; padding: 20px; }
+        input[type="text"] { width: 300px; padding: 5px; }
+        button { padding: 6px 12px; margin-top: 10px; }
+        table { border-collapse: collapse; margin-top: 20px; width: 80%; }
+        table, th, td { border: 1px solid #aaa; }
+        th, td { padding: 8px; text-align: left; vertical-align: top; }
+        ul { padding-left: 20px; margin: 0; }
+        .flash { padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        .flash-success { background-color: #d4edda; color: #155724; }
+        .flash-error { background-color: #f8d7da; color: #721c24; }
+        form.inline { display: inline; }
     </style>
 </head>
 <body>
 
 <h2>Edit Questions & Answers</h2>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Form - add question and answer -->
 <form method="POST">
+    <input type="hidden" name="action" value="add">
     <label>Question:</label><br>
     <input type="text" name="question" required><br><br>
 
     <label>Answer:</label><br>
     <input type="text" name="answer" required><br><br>
 
-    <button type="submit">Add Question</button>
+    <button type="submit">Add Question / Add Answer</button>
 </form>
 
 <h3>Existing Questions & Answers</h3>
@@ -48,18 +46,42 @@
 <table>
     <tr>
         <th>Question</th>
-        <th>Answer</th>
+        <th>Answers</th>
+        <th>Actions</th>
     </tr>
     {% for qa in qa_list %}
     <tr>
         <td>{{ qa.question }}</td>
-        <td>{{ qa.answer }}</td>
+        <td>
+            <ul>
+            {% for ans in qa.answer %}
+                <li>
+                    {{ ans }}
+                    <!-- Delete Answer -->
+                    <form method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this answer?');">
+                        <input type="hidden" name="action" value="delete_answer">
+                        <input type="hidden" name="question" value="{{ qa.question }}">
+                        <input type="hidden" name="answer" value="{{ ans }}">
+                        <button type="submit">Delete Answer</button>
+                    </form>
+                </li>
+            {% endfor %}
+            </ul>
+        </td>
+        <td>
+            <!-- delete whole question -->
+            <form method="POST" onsubmit="return confirm('Are you sure you want to delete this question and all its answers?');">
+                <input type="hidden" name="action" value="delete_question">
+                <input type="hidden" name="question" value="{{ qa.question }}">
+                <button type="submit">Delete Question</button>
+            </form>
+        </td>
     </tr>
     {% endfor %}
 </table>
 
 <br>
-<a href="/">Back to Dashboard</a>
+<p><a href="/">Back to Dashboard</a></p>
 
 </body>
 </html>

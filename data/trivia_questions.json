@@ -1,0 +1,72 @@
+[
+    {
+        "question": "Which programming language is mainly used for data science?",
+        "options": ["Python", "HTML", "CSS", "SQL"],
+        "answer": "Python"
+    },
+    {
+        "question": "What does CPU stand for?",
+        "options": [
+            "Central Processing Unit",
+            "Computer Power Unit",
+            "Core Processing Utility",
+            "Central Program Unit"
+        ],
+        "answer": "Central Processing Unit"
+    },
+    {
+        "question": "Which company developed the Windows operating system?",
+        "options": ["Apple", "Microsoft", "Google", "IBM"],
+        "answer": "Microsoft"
+    },
+    {
+        "question": "What does HTTP stand for?",
+        "options": [
+            "HyperText Transfer Protocol",
+            "High Transfer Text Program",
+            "Host Transfer Protocol",
+            "Hyper Transfer Tool Package"
+        ],
+        "answer": "HyperText Transfer Protocol"
+    },
+    {
+        "question": "Which of the following is a database system?",
+        "options": ["MySQL", "Python", "HTML", "Linux"],
+        "answer": "MySQL"
+    },
+    {
+        "question": "What is the correct file extension for a Python file?",
+        "options": [".py", ".java", ".html", ".exe"],
+        "answer": ".py"
+    },
+    {
+        "question": "Which device is used to store data permanently?",
+        "options": ["RAM", "CPU", "Hard Drive", "Cache"],
+        "answer": "Hard Drive"
+    },
+    {
+        "question": "What does GUI stand for?",
+        "options": [
+            "Graphical User Interface",
+            "General User Input",
+            "Global User Interaction",
+            "Graphic Utility Interface"
+        ],
+        "answer": "Graphical User Interface"
+    },
+    {
+        "question": "Which operating system is open-source?",
+        "options": ["Windows", "macOS", "Linux", "iOS"],
+        "answer": "Linux"
+    },
+    {
+        "question": "What is the purpose of a firewall?",
+        "options": [
+            "Increase internet speed",
+            "Protect a network",
+            "Store data",
+            "Run applications"
+        ],
+        "answer": "Protect a network"
+    }
+]

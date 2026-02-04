@@ -63,24 +63,20 @@ question_variants = {
     "what is python language": "what is python",
 }
 
-# ---- Idle / Suggestions settings ----
+#Idle  settings
 last_suggestions = []
-last_input_time = time.time()  # last user entry time
-IDLE_TIMEOUT = 60              # show temperature after 60s inactivity
+last_input_time = time.time()  #last user entry time
+IDLE_TIMEOUT = 60              #show temperature after 60s inactivity
 temperature_shown = False
 
-SUGGESTION_IDLE_TIMEOUT = 30   # ✅ suggest tips/questions after 30s inactivity
-suggestions_shown = False      # ✅ prevents repeating suggestions every second
+SUGGESTION_IDLE_TIMEOUT = 30   # suggest questions after 30s
+suggestions_shown = False      # prevents repeating suggestions every second
 
 # store recent user messages for better suggestions
-recent_user_inputs = []        # ✅ keep last few questions asked
+recent_user_inputs = []        # keep last few questions asked
 
-
+#Save chat log
 def save_chat_log(chat_log, directory="chat_logs"):
-    """Save chat log into a timestamped .txt file.
-    Filename format: chat-log-YYYY-MM-DD-HH-MM.txt
-    Returns the saved file path, or None if nothing was saved.
-    """
     if not chat_log:
         return None
 
@@ -205,7 +201,7 @@ def suggest_questions(keyword):
     return None
 
 
-# ✅ NEW: Suggest tips/questions based on recent chat activity
+# Suggest questions based on recent chat activity
 def get_idle_suggestions():
     tips = [
         "Tip: Type 'trivia' to play the trivia game.",
@@ -267,7 +263,7 @@ def temperature_display_loop():
     while True:
         idle_duration = time.time() - last_input_time
 
-        # ✅ 30s idle: show tips/questions
+        # 30s idle: show tips/questions
         if idle_duration >= SUGGESTION_IDLE_TIMEOUT and not suggestions_shown:
             try:
                 print(f"\n{get_time()} Chatbot: You seem idle. Here are some tips/questions:")
@@ -278,7 +274,7 @@ def temperature_display_loop():
             except Exception as e:
                 logging.warning(f"Failed to show idle suggestions: {e}")
 
-        # ✅ 60s idle: show temperature
+        # 60s idle: show temperature
         if idle_duration >= IDLE_TIMEOUT and not temperature_shown:
             try:
                 print(f"\n{get_time()} Idle mode → Display temperature")
@@ -308,7 +304,7 @@ def interactive_chat():
 
             last_input_time = time.time()
             temperature_shown = False
-            suggestions_shown = False  # ✅ reset suggestion flag when user types
+            suggestions_shown = False  # reset suggestion flag when user types
 
         except EOFError:
             break

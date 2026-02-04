@@ -1,29 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>List Questions & Answers</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { border-collapse: collapse; width: 80%; }
-        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; vertical-align: top; }
         th { background-color: #007BFF; color: white; }
+        ul { margin: 0; padding-left: 20px; }
+        form { margin-bottom: 20px; }
+        input[type="text"] { padding: 5px; width: 300px; }
+        button { padding: 6px 12px; }
     </style>
 </head>
 <body>
-    <h2>List of Questions & Answers</h2>
-    <table>
-        <tr>
-            <th>Question</th>
-            <th>Answer</th>
-        </tr>
-        {% for qa in qa_list %}
-        <tr>
-            <td>{{ qa.question }}</td>
-            <td>{{ qa.answer }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <p><a href="/">Back to Dashboard</a></p>
+
+<h2>List of Questions & Answers</h2>
+
+<form method="get" action="{{ url_for('list_qa') }}">
+    <input type="text" name="q" placeholder="Search question or answer..." value="{{ search_query }}">
+    <button type="submit">Search</button>
+    {% if search_query %}
+        <a href="{{ url_for('list_qa') }}">Clear</a>
+    {% endif %}
+</form>
+
+<table>
+    <tr>
+        <th>Question</th>
+        <th>Answer</th>
+    </tr>
+    {% for qa in qa_list %}
+    <tr>
+        <td>{{ qa.question }}</td>
+        <td>
+            <ul>
+            {% for ans in qa.answer %}
+                <li>{{ ans }}</li>
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No questions found.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><a href="/">Back to Dashboard</a></p>
+
 </body>
 </html>

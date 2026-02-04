@@ -90,11 +90,8 @@ chat_questions = {
     ],
 }
 
-def load_questions_from_file(filepath="chat_questions.json"):
-    """
-    Loads questions and answers from a JSON file into the chat_questions dictionary.
-    If the file does not exist or is corrupted, it handles the exception gracefully.
-    """
+def load_questions_from_file(filepath="data/chat_questions.json"):
+
     global chat_questions
     try:
         with open(filepath, "r", encoding="utf-8") as f:
@@ -166,7 +163,7 @@ def print_full_list():
         for j, ans in enumerate(answers, 1):
             print(f"     Answer {j}: {ans}")
 
-def save_questions_to_file(filepath="chat_questions.json"):
+def save_questions_to_file(filepath="data/chat_questions.json"):
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(chat_questions, f, ensure_ascii=False, indent=4)

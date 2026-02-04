@@ -2,6 +2,8 @@ import argparse
 import logging
 import subprocess
 import sys
+import os
+import logging
 from utils import get_time
 from questions_handler import (
     add_question,
@@ -11,6 +13,9 @@ from questions_handler import (
     import_csv,
 )
 from chatbot import play_trivia, cli_mode
+
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -49,7 +54,7 @@ def handle_cli_args():
 
     if args.log:
         logging.basicConfig(
-            filename="chatbot.log",
+            filename=os.path.join(LOG_DIR, "chatbot.log"),
             filemode="a",
             level=logging.INFO if args.log_level == "INFO" else logging.WARNING,
             format="%(asctime)s [%(levelname)s] %(message)s"

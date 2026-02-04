@@ -1,0 +1,16 @@
+You: Hi
+Chatbot: Hello! What else would you like to know?
+You: Trivia
+Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question.
+You: trivia4
+Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question.
+You: what is python
+Chatbot: Python is a popular programming language used for many types of software development. What else would you like to know?
+You: python
+Chatbot: Sorry, I don't recognize that question (or combination of questions). Please ask another question.
+You might want to ask:
+1. what is python
+2. what can you do with python
+You: 1
+Chatbot: Python is a popular programming language used for many types of software development. What else would you like to know?
+You: save log

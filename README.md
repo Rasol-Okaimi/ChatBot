@@ -1,18 +1,21 @@
 # ChatBot_Projekt7
+```
+"This project is a chatbot designed to assist users by providing information 
+and answers, interacting with them, and offering full support similar to a customer service representative. 
+It has been trained on a limited knowledge base for now.
+```
 
 
+## Development Team - Group 7 :
+```
+Rasol Mohammed Ali Al-Okaimi
+Samarth Ghanshyambhai Jyani
+Srushti Ghanshyambhai Sanghani
+Krupaliben Ribadia
+```
 
-## Getting started
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+### Installation Steps
 ```
 cd existing_repo
 git remote add origin https://gitlab-fi.ostfalia.de/id137458/chatbot_projekt7.git
@@ -20,74 +23,91 @@ git branch -M main
 git push -uf origin main
 ```
 
-## Integrate with your tools
+```
+Run main chatbot python (chatbot.py) to start chat with system.
+```
 
-- [ ] [Set up project integrations](https://gitlab-fi.ostfalia.de/id137458/chatbot_projekt7/-/settings/integrations)
+```
+Run chat_app.py to start chat with system using our webpage.
+```
 
-## Collaborate with your team
+```
+Run admin_server.py to start Chatbot Admin Panel.
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+## Project Structure and functions 
+```
+1-Folders 
+A-data/Project data files :
+--user.json (user data)
+-- chat_questions.json (questions database)
+-- trivia_questions.json (trivia)
+-- chat_questions.json
+-- questions.csv (sample to be used for import questions test)
+B-logs/Project logs 
+C-templates/Html Web Pages
 
-## Test and Deploy
+2-Flask
+--------------------------------------
+A- admin_server.py -- Admin Flask application - port  : http://127.0.0.1:5000/ 
+#31 Create base management web-page (dashboard.html)
+** user managment page () list_users.html + log page (logs.html)
+#32 Allow service-provider to view questions/answers (list_qa.html)
+#33 Allow service-provider to search for questions/answers (list_qa.html)
+#36 Allow service-provider to edit questions/answers (edit_qa.html)   
+#35 Allow service-provider to add/remove questions/answers (edit_qa.html) 
 
-Use the built-in continuous integration in GitLab.
+B- chat_app.py -- Chat Flask application - port  : http://127.0.0.1:5000/
+#34 Create base chat page (chat.html)
+#37 Allow user to chat without page reloads (chat.html)
+#38 Suggest tips/questions after a period of inactivity  (chat.html)
+#39 Allow user to download chat log  (chat.html) 
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+3-Python Files 
+A-chatbot.py - Main chatbot application (Start & Run)
+-Manages the interactive chat loop with the user.
+-Processes user inputs and provides answers based on stored questions and weather info.
+-Supports multiple questions in one input, saves chat logs, and handles idle suggestions and temperature display.
+-Integrates a trivia game and Sense HAT LED display (if available).
+-Supports commands like "save log," "trivia," and exit commands.
+B-cli_handler.py (Command-line interface handler)
+-Parses command-line arguments to enable features like logging, importing questions from CSV, adding/removing questions, running tests, and asking questions directly.
+-Enables non-interactive use of the chatbot through CLI flags and arguments.
 
-***
+C-display.py (Visual output manager for Sense HAT)
+-Displays startup and trivia game status symbols on the Raspberry Pi Sense HAT LED matrix.
+-Shows game results, player's score, and idle temperature info visually.
+-Handles LED clearing and safe display timing.
 
-# Editing this README
+D-questions_handler.py (Question and answer management)
+-Stores the main database of chatbot questions and answers.
+-Loads and saves questions from/to JSON files.
+-Imports questions from CSV files with validation.
+-Allows adding/removing questions or specific answers.
+-Provides listing of all stored questions.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+E-test_chatbot.py (Unit tests for chatbot)
+-Tests chatbot's response accuracy for known questions and variants.
+-Verifies handling of compound questions and unknown queries.
+-Tests suggestion system for question prompts.
+-Uses Python's unittest framework for automated testing.
+F-trivia_game.py (Trivia game module)
+-Loads trivia questions from a JSON file and runs an interactive quiz game.
+-Displays game status and results via Sense HAT LED (if available).
+-Tracks and shows the player’s score, supports early exit.
+-Provides user prompts and input validation during the game.
+G-utils.py (Utility functions and help text)
+-Provides a formatted current time string for logging and prompts.
+-Contains detailed CLI help text explaining available command-line options and usage examples.
+H-weather_app.py(Weather information module)
+-Fetches current weather and forecast data using the OpenWeatherMap API.
+-Contains predefined event locations with descriptions and event dates.
+-Provides formatted weather reports for current or future dates at specified locations.
+-Handles fallback to current weather if forecast data for a date is unavailable.
 
-## Suggestions for a good README
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Support Files
+README.md
+requirements.txt
 
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
