@@ -5,16 +5,6 @@ and answers, interacting with them, and offering full support similar to a custo
 It has been trained on a limited knowledge base for now.
 ```
 
-
-## Development Team - Group 7 :
-```
-Rasol Mohammed Ali Al-Okaimi
-Samarth Ghanshyambhai Jyani
-Srushti Ghanshyambhai Sanghani
-Krupaliben Ribadia
-```
-
-
 ### Installation Steps
 ```
 cd existing_repo
@@ -70,6 +60,7 @@ A-chatbot.py - Main chatbot application (Start & Run)
 -Supports multiple questions in one input, saves chat logs, and handles idle suggestions and temperature display.
 -Integrates a trivia game and Sense HAT LED display (if available).
 -Supports commands like "save log," "trivia," and exit commands.
+
 B-cli_handler.py (Command-line interface handler)
 -Parses command-line arguments to enable features like logging, importing questions from CSV, adding/removing questions, running tests, and asking questions directly.
 -Enables non-interactive use of the chatbot through CLI flags and arguments.
@@ -91,14 +82,17 @@ E-test_chatbot.py (Unit tests for chatbot)
 -Verifies handling of compound questions and unknown queries.
 -Tests suggestion system for question prompts.
 -Uses Python's unittest framework for automated testing.
+
 F-trivia_game.py (Trivia game module)
 -Loads trivia questions from a JSON file and runs an interactive quiz game.
 -Displays game status and results via Sense HAT LED (if available).
 -Tracks and shows the player’s score, supports early exit.
 -Provides user prompts and input validation during the game.
+
 G-utils.py (Utility functions and help text)
 -Provides a formatted current time string for logging and prompts.
 -Contains detailed CLI help text explaining available command-line options and usage examples.
+
 H-weather_app.py(Weather information module)
 -Fetches current weather and forecast data using the OpenWeatherMap API.
 -Contains predefined event locations with descriptions and event dates.
